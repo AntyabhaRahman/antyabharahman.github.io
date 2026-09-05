@@ -26,7 +26,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 				</svg>
 				<dl class="panel-spec hand">
 					<div><dt>Entries</dt><dd>{String(p.count).padStart(2, '0')}</dd></div>
-					<div><dt>Updated</dt><dd>{p.items[0] ? fmt(p.items[0].date) : 'none'}</dd></div>
+					<div><dt class="sr">Updated</dt><dd>{p.items[0] ? fmt(p.items[0].date) : 'none'}</dd></div>
 				</dl>
 				<h2 class="panel-title display" data-px><a href={p.href}>{p.title}</a></h2>
 			</div>
@@ -58,7 +58,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.panel {
 		flex: 1 1 0; min-width: 5.5rem;
 		background: color-mix(in srgb, var(--paper) 78%, transparent); box-shadow: var(--shadow);
-		display: grid; grid-template-columns: auto 1fr; overflow: hidden;
+		display: grid; grid-template-columns: auto 1fr; grid-template-rows: minmax(0, 1fr); overflow: hidden;
 		transform: rotate(var(--tilt));
 		transition: flex 620ms cubic-bezier(0.32, 0.72, 0, 1), transform 620ms cubic-bezier(0.32, 0.72, 0, 1), background-color 400ms ease;
 	}
@@ -84,7 +84,10 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.panel-stack { display: flex; flex-direction: column; gap: 1rem; }
 	.panel-spec { margin: auto 0; display: flex; gap: 1.15rem; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; flex: 0 1 auto; min-height: 0; overflow: hidden; }
 	.panel-title { flex-shrink: 0; }
+	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 	@media (max-height: 820px) and (min-width: 761px) { .panel-title { font-size: 2.4rem; } }
+	/* A short window has no room on the spine for the spec. */
+	@media (max-height: 680px) and (min-width: 761px) { .panel-spec { display: none; } }
 	.panel-spec > div { display: flex; gap: 0.35rem; }
 	.panel-spec dt { color: var(--graphite); }
 	.panel-spec dd { margin: 0; color: var(--ink); }
