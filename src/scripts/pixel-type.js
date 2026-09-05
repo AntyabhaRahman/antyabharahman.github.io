@@ -160,10 +160,9 @@ function sampleBorder(el, dpr) {
 
 export function lightUp() {
 	document.documentElement.classList.remove('px-wait');
-	// Under Reduce Motion the entrance keeps its identity but loses its motion: no sweep across
-	// the page, no jitter, no grey stages. Every word dissolves from cells to text at once.
-	const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-	const sweep = reduce ? 0 : SWEEP, jitter = reduce ? 0 : JITTER, ramp = reduce ? 1 : RAMP, fadeMs = reduce ? 420 : FADE;
+	// The site runs its motion regardless of the Reduce Motion setting. The owner chose this on
+	// 2026-09-05 so every browser shows the same page.
+	const sweep = SWEEP, jitter = JITTER, ramp = RAMP, fadeMs = FADE;
 	const targets = [...document.querySelectorAll('[data-px]')];
 	if (!targets.length) return;
 	const dpr = Math.min(2, devicePixelRatio || 1);

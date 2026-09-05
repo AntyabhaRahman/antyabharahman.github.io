@@ -34,7 +34,8 @@ export function mountPixelField(canvas, options) {
 	const ctx = canvas.getContext('2d');
 	if (!ctx) return { destroy() {} };
 	const parent = canvas.parentElement || canvas;
-	const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+	// Motion runs regardless of the Reduce Motion setting, by the owner's choice on 2026-09-05.
+	const motion = { matches: false, addEventListener() {}, removeEventListener() {} };
 	const ink = [null, FALLBACK[0], FALLBACK[1], FALLBACK[2], FALLBACK[3], '#000000'];
 	let paper = '#ffffff';
 

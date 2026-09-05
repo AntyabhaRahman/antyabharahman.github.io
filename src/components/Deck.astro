@@ -66,7 +66,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.panel:hover, .panel:focus-within { flex-grow: 3.2; transform: rotate(0deg) translateY(-4px); background: color-mix(in srgb, var(--paper) 96%, transparent); }
 	.deck:has(.panel:focus-within) .panel:hover:not(:focus-within) { flex-grow: 1; }
 	.panel-side { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; gap: 1rem; padding: 1.3rem 0.9rem; }
-	.panel-draw { margin-bottom: auto; width: 3rem; height: 3rem; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; filter: url(#sketch); transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1); }
+	.panel-draw { width: 3rem; height: 3rem; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; filter: url(#sketch); transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1); }
 	.panel-draw .hatch { stroke: var(--graphite); stroke-width: 0.7; opacity: 0.7; }
 	.panel:hover .panel-draw, .panel:focus-within .panel-draw { transform: rotate(-3deg); }
 	.panel-title {
@@ -82,7 +82,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	}
 	.panel:hover .panel-body, .panel:focus-within .panel-body { opacity: 1; transform: none; transition-delay: 160ms; }
 	.panel-stack { display: flex; flex-direction: column; gap: 1rem; }
-	.panel-spec { margin: 0; display: flex; gap: 1.15rem; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; flex: none; height: 11rem; overflow: hidden; }
+	.panel-spec { margin: 0; display: flex; justify-content: flex-end; gap: 1.15rem; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; flex: 1 1 auto; min-height: 0; overflow: hidden; }
 	.panel-title { flex-shrink: 0; }
 	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 	@media (max-height: 820px) and (min-width: 761px) { .panel-title { font-size: 2.4rem; } }
@@ -97,9 +97,6 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.panel-items .hand { font-size: 0.7rem; }
 	.panel-all { align-self: flex-start; font-size: 0.95rem; }
 
-	@media (prefers-reduced-motion: reduce) {
-		.panel, .panel-body { transition-duration: 1ms; }
-	}
 	@media (hover: none) {
 		.panel-body { opacity: 1; transform: none; }
 	}
@@ -111,8 +108,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 		.panel-side { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 1.2rem 1.2rem 0; }
 		.panel-draw { grid-column: 2; grid-row: 1; }
 		.panel-title { grid-column: 1; grid-row: 1; writing-mode: horizontal-tb; transform: none; font-size: clamp(1.55rem, 8vw, 2rem); min-width: 0; }
-		.panel-spec { grid-column: 1 / -1; grid-row: 2; margin: 0; height: auto; overflow: visible; writing-mode: horizontal-tb; transform: none; justify-content: flex-start; flex-wrap: wrap; }
-		.panel-draw { margin-bottom: 0; }
+		.panel-spec { grid-column: 1 / -1; grid-row: 2; margin: 0; flex: none; overflow: visible; writing-mode: horizontal-tb; transform: none; justify-content: flex-start; flex-wrap: wrap; }
 		.panel-spec > div { gap: 0.25rem; }
 		.panel-body { opacity: 1; transform: none; padding: 1rem 1.2rem 1.4rem; min-width: 0; }
 	}

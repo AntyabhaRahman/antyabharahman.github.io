@@ -45,8 +45,7 @@
 		const r = btn.getBoundingClientRect();
 		root.style.setProperty('--vt-x', `${r.left + r.width / 2}px`);
 		root.style.setProperty('--vt-y', `${r.top + r.height / 2}px`);
-		const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-		if (!reduce && 'startViewTransition' in document) {
+		if ('startViewTransition' in document) {
 			(document as any).startViewTransition(apply);
 		} else {
 			apply();
