@@ -21,6 +21,14 @@ const TRAIL_LIFE = 10; // seconds a trail cell can survive
 const HOLD = 3.5; // seconds to rest in a basin before a restart
 const LOOP = 60; // seconds for one full cycle of the terrain
 
+export function spawnPoint(cols, rows, side) {
+	return [cols * (side > 0 ? 0.88 : 0.12), rows * (side > 0 ? 0.12 : 0.88)];
+}
+
+export function isContourDot(bands, cols, i, hash) {
+	return hash[i] <= 0.38 && (bands[i] !== bands[i + 1] || bands[i] !== bands[i + cols]);
+}
+
 export function mountPixelField(canvas, options) {
 	const trail = (options && options.mode) === 'trail';
 	const ctx = canvas.getContext('2d');
@@ -70,18 +78,9 @@ export function mountPixelField(canvas, options) {
 		paper = style.getPropertyValue('--paper').trim() || paper;
 	}
 
-	// The ball starts high in the exposed margin beside the deck, so the descent is seen.
+	// Alternate between opposite corners so the descent can cross the whole field.
 	function startBall() {
-		const box = canvas.getBoundingClientRect();
-		let left = 0, right = cssW;
-		const deck = parent.querySelector('.deck');
-		if (deck) {
-			const d = deck.getBoundingClientRect();
-			left = d.left - box.left;
-			right = d.right - box.left;
-		}
-		const margin = side > 0 ? [right, cssW] : [0, left];
-		q = [(margin[0] + margin[1]) / 2 / PITCH, side > 0 ? rows * 0.12 : rows * 0.88];
+		q = spawnPoint(cols, rows, side);
 		v = [0, 0];
 		calm = 0;
 		rest = 0;
@@ -214,7 +213,7 @@ export function mountPixelField(canvas, options) {
 		const s3 = Math.sin(wx * 0.074 + ph) + Math.sin(wy * 0.059 - ph + 1.3) + Math.sin((wx + wy) * 0.041 + 2 * ph + 0.4);
 		// A steep rim at the canvas edges keeps the ball inside. The interior stays flat.
 		const bx = (x - cols / 2) / (cols / 2), by = (y - rows / 2) / (rows / 2);
-		const rim = 0.2 * (bx ** 6 + by ** 6);
+		const rim = 0.08 * (bx ** 6 + by ** 6);
 		return 0.5 + s3 / 6 + rim + HILL * heat(x, y);
 	}
 
@@ -316,6 +315,18 @@ export function mountPixelField(canvas, options) {
 				const y = (i / cols) | 0;
 				ctx.fillRect((i - y * cols) * PITCH, y * PITCH, SQUARE, SQUARE);
 			}
+		}
+		if (!trail) {
+			ctx.fillStyle = ink[5];
+			ctx.globalAlpha = 0.32;
+			for (let y = 0; y < rows - 1; y++) {
+				for (let x = 0; x < cols - 1; x++) {
+					const i = y * cols + x;
+					if (!isContourDot(band, cols, i, hash)) continue;
+					ctx.fillRect(x * PITCH + SQUARE / 2, y * PITCH + SQUARE / 2, 1.5, 1.5);
+				}
+			}
+			ctx.globalAlpha = 1;
 		}
 		if (!trail) {
 			// The head lights up through the greys after a restart. A paper outline then
