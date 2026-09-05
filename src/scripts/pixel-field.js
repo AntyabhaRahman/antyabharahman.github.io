@@ -353,7 +353,8 @@ export function mountPixelField(canvas, options) {
 		const dt = Math.min(0.05, (now - last) / 1000);
 		last = now;
 		time += dt;
-		if (selectionDirty) {
+		// A held selection is re-applied every frame, so it stays lit while the rest decays.
+		if (selectionDirty || (trail && !document.getSelection()?.isCollapsed)) {
 			selectionDirty = false;
 			applySelection();
 		}

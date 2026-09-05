@@ -138,7 +138,7 @@ function sampleBorder(el, dpr) {
 	const local = new DOMMatrix().translate(-L, -T).multiply(total).translate(L, T);
 	const canvas = document.createElement('canvas');
 	canvas.setAttribute('aria-hidden', 'true');
-	canvas.style.cssText = `position:fixed;left:${L}px;top:${T}px;width:${w}px;height:${h}px;transform-origin:0 0;transform:${local};z-index:60;pointer-events:none;filter:url(#sketch)`;
+	canvas.style.cssText = `position:absolute;left:${L + scrollX}px;top:${T + scrollY}px;width:${w}px;height:${h}px;transform-origin:0 0;transform:${local};z-index:60;pointer-events:none;filter:url(#sketch)`;
 	canvas.width = w * dpr;
 	canvas.height = h * dpr;
 	const color = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
@@ -162,7 +162,8 @@ export function lightUp() {
 		wd.ready = 0;
 		for (let k = 0; k < wd.delay.length; k++) {
 			const pt = wd.place.transformPoint({ x: wd.cells[2 * k], y: wd.cells[2 * k + 1] });
-			wd.delay[k] = (pt.x / innerWidth) * SWEEP + Math.random() * JITTER;
+			// The front runs from the top left corner to the bottom right, so no column lights as one line.
+			wd.delay[k] = ((pt.x / innerWidth) * 0.65 + (pt.y / innerHeight) * 0.35) * SWEEP + Math.random() * JITTER;
 			wd.ready = Math.max(wd.ready, wd.delay[k] + RAMP);
 		}
 		if (wd.span) wd.span.style.color = 'transparent';
@@ -179,6 +180,9 @@ export function lightUp() {
 	// Pointer interaction waits until every word and border is solid.
 	document.documentElement.classList.add('px-live');
 
+	// Words were measured in viewport coordinates at this scroll offset. A scroll during the
+	// light-up shifts the text canvas by the difference so the cells stay on their words.
+	const sx0 = scrollX, sy0 = scrollY;
 	const t0 = performance.now();
 	function frame(now) {
 		const t = now - t0;
@@ -190,11 +194,12 @@ export function lightUp() {
 			const fade = Math.min(1, (t - wd.ready) / FADE);
 			const ctx = wd.border ? wd.ctx : ctxText;
 			if (wd.border) {
+				ctx.setTransform(1, 0, 0, 1, 0, 0);
+				ctx.clearRect(0, 0, wd.canvas.width, wd.canvas.height);
 				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
 			} else {
 				const { a, b, c, d, e, f } = wd.place;
-				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+				ctx.setTransform(dpr, 0, 0, dpr, (sx0 - scrollX) * dpr, (sy0 - scrollY) * dpr);
 				ctx.transform(a, b, c, d, e, f);
 			}
 			if (fade > 0) {

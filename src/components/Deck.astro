@@ -98,7 +98,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	@media (hover: none) {
 		.panel-body { opacity: 1; transform: none; }
 	}
-	@media (max-width: 760px) {
+	@media (hover: none), (max-width: 760px) {
 		.deck { flex-direction: column; height: auto; min-height: 0; }
 		.panel { flex: none; transform: none; grid-template-columns: 1fr; }
 		.panel:hover, .panel:focus-within { flex: none; transform: none; }
