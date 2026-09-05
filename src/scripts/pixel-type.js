@@ -241,4 +241,7 @@ export function lightUp() {
 	requestAnimationFrame(frame);
 }
 
-document.fonts.ready.then(lightUp);
+// A back or forward navigation restores a page the reader has already seen. It comes back
+// as it was, with no entrance.
+const nav = performance.getEntriesByType('navigation')[0];
+if (nav?.type !== 'back_forward') document.fonts.ready.then(lightUp);
