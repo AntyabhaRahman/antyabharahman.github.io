@@ -160,7 +160,10 @@ function sampleBorder(el, dpr) {
 
 export function lightUp() {
 	document.documentElement.classList.remove('px-wait');
-	if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+	// Under Reduce Motion the entrance keeps its identity but loses its motion: no sweep across
+	// the page, no jitter, no grey stages. Every word dissolves from cells to text at once.
+	const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const sweep = reduce ? 0 : SWEEP, jitter = reduce ? 0 : JITTER, ramp = reduce ? 1 : RAMP, fadeMs = reduce ? 420 : FADE;
 	const targets = [...document.querySelectorAll('[data-px]')];
 	if (!targets.length) return;
 	const dpr = Math.min(2, devicePixelRatio || 1);
@@ -176,8 +179,8 @@ export function lightUp() {
 		for (let k = 0; k < wd.delay.length; k++) {
 			const pt = wd.place.transformPoint({ x: wd.cells[2 * k], y: wd.cells[2 * k + 1] });
 			// The front runs from the top left corner to the bottom right, so no column lights as one line.
-			wd.delay[k] = ((pt.x / innerWidth) * 0.65 + (pt.y / innerHeight) * 0.35) * SWEEP + Math.random() * JITTER;
-			wd.ready = Math.max(wd.ready, wd.delay[k] + RAMP);
+			wd.delay[k] = ((pt.x / innerWidth) * 0.65 + (pt.y / innerHeight) * 0.35) * sweep + Math.random() * jitter;
+			wd.ready = Math.max(wd.ready, wd.delay[k] + ramp);
 		}
 		if (wd.span) wd.span.style.color = 'transparent';
 	}
@@ -206,7 +209,7 @@ export function lightUp() {
 		let done = true;
 		for (const wd of words) {
 			if (wd.finished) continue;
-			const fade = Math.min(1, (t - wd.ready) / FADE);
+			const fade = Math.min(1, (t - wd.ready) / fadeMs);
 			const ctx = wd.border ? wd.ctx : ctxText;
 			if (wd.border) {
 				ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -234,7 +237,7 @@ export function lightUp() {
 			ctx.globalAlpha = down;
 			const c = wd.cell;
 			for (let k = 0; k < wd.delay.length; k++) {
-				const p = (t - wd.delay[k]) / RAMP;
+				const p = (t - wd.delay[k]) / ramp;
 				if (p <= 0) continue;
 				ctx.fillStyle = p < 1 / 3 ? stages[0] : p < 2 / 3 ? stages[1] : wd.color;
 				ctx.fillRect(wd.cells[2 * k], wd.cells[2 * k + 1], c - 1, c - 1);
