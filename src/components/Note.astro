@@ -10,7 +10,7 @@ const arrows = {
 ---
 <span class={`note ${cls}`}>
 	{dir === 'left' && <svg viewBox="0 0 24 14" aria-hidden="true"><path d={arrows.left} /></svg>}
-	<slot />
+	<span><slot /></span>
 	{dir === 'right' && <svg viewBox="0 0 24 14" aria-hidden="true"><path d={arrows.right} /></svg>}
 	{dir === 'down' && <svg class="down" viewBox="0 0 16 14" aria-hidden="true"><path d={arrows.down} /></svg>}
 </span>

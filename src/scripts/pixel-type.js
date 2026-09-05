@@ -163,7 +163,9 @@ export function lightUp() {
 	// The site runs its motion regardless of the Reduce Motion setting. The owner chose this on
 	// 2026-09-05 so every browser shows the same page.
 	const sweep = SWEEP, jitter = JITTER, ramp = RAMP, fadeMs = FADE;
-	const targets = [...document.querySelectorAll('[data-px]')];
+	// A hidden host, such as a deck body at rest on desktop, gets no cells. Its text would
+	// otherwise light up over an empty sheet.
+	const targets = [...document.querySelectorAll('[data-px]')].filter((t) => getComputedStyle(t).opacity !== '0');
 	if (!targets.length) return;
 	const dpr = Math.min(2, devicePixelRatio || 1);
 	const words = targets.flatMap(wrapWords).map((s) => sample(s, dpr)).filter(Boolean);

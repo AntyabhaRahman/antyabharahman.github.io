@@ -106,8 +106,8 @@ a { color: inherit; text-decoration: none; }
 .px-wait [data-px], .px-wait [data-px-border] { visibility: hidden; }
 /* During the entrance, underlines, tag marks, drawings and the toggle wait. They grow or fade in when the last word is solid. */
 .px-live .u, .px-live .nav a, .px-live .nav a[aria-current='page'] { background-size: 0% 1px; }
-.tag::before, .panel-draw, .theme-toggle svg { transition: opacity 320ms ease; }
-.px-live .tag::before, .px-live .panel-draw, .px-live .theme-toggle svg { opacity: 0; }
+.tag::before, .nav a[aria-current='page']::before, .panel-draw, .theme-toggle svg { transition: opacity 320ms ease; }
+.px-live .tag::before, .px-live .nav a[aria-current='page']::before, .px-live .panel-draw, .px-live .theme-toggle svg { opacity: 0; }
 .u--bare { background-image: linear-gradient(var(--accent), var(--accent)); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 
