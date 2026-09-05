@@ -148,7 +148,7 @@ a { color: inherit; text-decoration: none; }
 .nav { display: flex; gap: 1.6rem; align-items: center; font-family: var(--font-label); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
 .nav a[aria-current='page'] { color: var(--accent-ink); }
 .nav a[aria-current='page']::before { content: '•'; margin-right: 0.45em; font-family: var(--font-mono); }
-.site-footer { margin-top: 4rem; padding: 1.25rem 0 1.4rem; color: var(--graphite); font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; justify-content: space-between; }
+.site-footer { margin-top: auto; padding: 2rem 0 1.4rem; color: var(--graphite); font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; justify-content: space-between; }
 
 /* Margin note: hand lettering with a small drawn arrow. */
 .note { font-family: var(--font-label); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--graphite); display: inline-flex; align-items: center; gap: 0.5em; line-height: 1.1; white-space: nowrap; }
