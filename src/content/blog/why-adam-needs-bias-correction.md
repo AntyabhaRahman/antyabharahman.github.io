@@ -19,7 +19,7 @@ $$
 m_t = (1 - \beta_1) \sum_{i=1}^{t} \beta_1^{\,t-i} g_i
 $$
 
-Assume the gradient distribution holds still over the window the average covers, so $\mathbb{E}[g_i] = \mathbb{E}[g]$ for every $i$. Pull the expectation through the sum and substitute $k = t - i$.
+Assume the gradient distribution holds still over the window the average covers, so $\mathbb{E}[g_i] = \mathbb{E}[g]$ for every $i$. Pull the expectation through the sum and substitute $k = t - i.$
 
 $$
 \mathbb{E}[m_t] = (1 - \beta_1)\, \mathbb{E}[g] \sum_{k=0}^{t-1} \beta_1^{\,k} = \mathbb{E}[g] \left(1 - \beta_1^{\,t}\right)

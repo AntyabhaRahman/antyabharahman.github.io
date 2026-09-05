@@ -86,9 +86,14 @@ th { font-weight: 600; }
 blockquote { margin: 1.2em 0; padding-left: 1em; border-left: 2px solid var(--pencil); color: var(--graphite); font-style: italic; }
 img { max-width: 100%; }
 .katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.2em 0; }
+@media (max-width: 640px) {
+	.katex-display { font-size: 0.9em; mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); }
+}
 
 /* Links. The underline grows from the left. skiper40 style. */
 a { color: inherit; text-decoration: none; }
+/* A neutral highlight. The browser blue fought the grey field and the ink. */
+::selection { background: color-mix(in srgb, var(--ink) 14%, transparent); color: inherit; }
 .u, .prose a {
 	background-image: linear-gradient(var(--graphite), var(--graphite)), linear-gradient(var(--accent), var(--accent));
 	background-size: 100% 1px, 0% 2px;
@@ -98,6 +103,11 @@ a { color: inherit; text-decoration: none; }
 	padding-bottom: 1px;
 }
 .u:hover, .prose a:hover, .u:focus-visible, .prose a:focus-visible { background-size: 100% 1px, 100% 2px; color: var(--ink); }
+.px-wait [data-px], .px-wait [data-px-border] { visibility: hidden; }
+/* During the entrance, underlines, tag marks, drawings and the toggle wait. They grow or fade in when the last word is solid. */
+.px-live .u, .px-live .nav a, .px-live .nav a[aria-current='page'] { background-size: 0% 1px, 0% 2px; }
+.tag::before, .panel-draw, .theme-toggle svg { transition: opacity 320ms ease; }
+.px-live .tag::before, .px-live .panel-draw, .px-live .theme-toggle svg { opacity: 0; }
 .u--bare { background-image: none, linear-gradient(var(--accent), var(--accent)); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 
@@ -128,7 +138,7 @@ hr.rough::before { border: 0; border-top: 1.5px solid var(--ink); inset: 0 auto 
 .role { font-family: var(--font-label); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--graphite); white-space: nowrap; }
 .nav { display: flex; gap: 1.6rem; align-items: center; font-family: var(--font-label); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
 .nav a[aria-current='page'] { color: var(--accent-ink); background-size: 100% 1px, 100% 2px; }
-.site-footer { margin-top: auto; padding: 2rem 0 1.4rem; color: var(--graphite); font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; justify-content: space-between; }
+.site-footer { margin-top: auto; padding: 1.25rem 0 1.4rem; color: var(--graphite); font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; justify-content: space-between; }
 
 /* Margin note: hand lettering with a small drawn arrow. */
 .note { font-family: var(--font-label); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--graphite); display: inline-flex; align-items: center; gap: 0.5em; line-height: 1.1; white-space: nowrap; }
@@ -140,6 +150,7 @@ hr.rough::before { border: 0; border-top: 1.5px solid var(--ink); inset: 0 auto 
 .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; }
 .card { padding: 1.25rem 1.4rem 1.2rem; background: var(--paper); display: grid; gap: 0.35rem; }
 .card h2, .card h3 { margin: 0; font-size: 1.2rem; }
+.card p { max-width: var(--measure); }
 .card .meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; align-items: baseline; font-size: 0.85rem; color: var(--graphite); }
 .tag { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--graphite); }
 .tag::before { content: '#'; opacity: 0.6; }
@@ -163,3 +174,9 @@ canvas.pf { display: block; pointer-events: none; }
 	.nav { gap: 1rem; font-size: 0.9rem; }
 }
 .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.85; }
+
+/* Touch targets. The ink stays the same, the hit box grows. */
+@media (hover: none) {
+	.nav a, .card .meta a, .panel-items a, .panel-all, .site-footer a, .note a { display: inline-block; padding-block: 0.6rem; margin-block: -0.6rem; }
+	.card .meta { gap: 0.9rem 1.25rem; }
+}

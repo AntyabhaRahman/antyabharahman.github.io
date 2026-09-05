@@ -159,6 +159,7 @@ function sampleBorder(el, dpr) {
 }
 
 export function lightUp() {
+	document.documentElement.classList.remove('px-wait');
 	if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 	const targets = [...document.querySelectorAll('[data-px]')];
 	if (!targets.length) return;
@@ -183,7 +184,9 @@ export function lightUp() {
 
 	const canvas = document.createElement('canvas');
 	canvas.setAttribute('aria-hidden', 'true');
-	canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:60;pointer-events:none';
+	// The box is sized in px, not percent. A classic scrollbar makes 100% narrower than
+	// innerWidth, which would scale the cells off their glyphs.
+	canvas.style.cssText = `position:fixed;left:0;top:0;width:${innerWidth}px;height:${innerHeight}px;z-index:60;pointer-events:none`;
 	canvas.width = innerWidth * dpr;
 	canvas.height = innerHeight * dpr;
 	document.body.appendChild(canvas);
@@ -214,10 +217,12 @@ export function lightUp() {
 				ctx.setTransform(dpr, 0, 0, dpr, (sx0 - scrollX) * dpr, (sy0 - scrollY) * dpr);
 				ctx.transform(a, b, c, d, e, f);
 			}
+			// Two layers of the same ink composited over each other cover 1 - f + f² of a stroke,
+			// which pales to 75% at the midpoint. Square roots on both curves lift that to 91%.
+			const up = Math.sqrt(Math.max(0, fade)), down = Math.sqrt(1 - Math.max(0, fade));
 			if (fade > 0) {
-				// The real thing fades in by the same fraction the cells fade out.
-				if (wd.span) wd.span.style.color = `color-mix(in srgb, ${wd.color} ${fade * 100}%, transparent)`;
-				else wd.el.style.setProperty('--pxb', String(fade));
+				if (wd.span) wd.span.style.color = `color-mix(in srgb, ${wd.color} ${up * 100}%, transparent)`;
+				else wd.el.style.setProperty('--pxb', String(up));
 			}
 			if (fade >= 1) {
 				if (wd.span) wd.span.style.color = '';
@@ -226,7 +231,7 @@ export function lightUp() {
 				continue;
 			}
 			done = false;
-			ctx.globalAlpha = fade > 0 ? 1 - fade : 1;
+			ctx.globalAlpha = down;
 			const c = wd.cell;
 			for (let k = 0; k < wd.delay.length; k++) {
 				const p = (t - wd.delay[k]) / RAMP;
@@ -253,7 +258,18 @@ export function lightUp() {
 	requestAnimationFrame(frame);
 }
 
+// Text waits under px-wait until the entrance starts, so no plain text flashes first. The
+// timeout is a safety net: if the entrance never runs, the text shows anyway.
+const html = document.documentElement;
+html.classList.add('px-wait');
+setTimeout(() => html.classList.remove('px-wait'), 3000);
+
 // A back or forward navigation restores a page the reader has already seen. It comes back
-// as it was, with no entrance.
+// as it was, with no entrance. Otherwise the entrance waits for the load event, so every
+// stylesheet has applied and every font has at least started to load, and then for the
+// fonts. fonts.ready alone can resolve before the font stylesheet has arrived, and the page
+// then reflows after the cells were sampled.
 const nav = performance.getEntriesByType('navigation')[0];
-if (nav?.type !== 'back_forward') document.fonts.ready.then(lightUp);
+const loaded = document.readyState === 'complete' ? Promise.resolve() : new Promise((r) => addEventListener('load', r, { once: true }));
+if (nav?.type === 'back_forward') html.classList.remove('px-wait');
+else loaded.then(() => document.fonts.ready).then(lightUp);

@@ -53,7 +53,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 <style>
 	.deck {
 		display: flex; gap: 1.25rem; align-items: stretch;
-		height: min(72dvh, 44rem); min-height: 30rem;
+		height: clamp(22rem, 72dvh, 44rem);
 		position: relative; z-index: 1;
 	}
 	.panel {
@@ -77,7 +77,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.panel-title a { display: block; }
 	.panel-body {
 		padding: 2rem 2rem 2rem 0.75rem; min-width: 18rem;
-		display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;
+		display: flex; flex-direction: column; justify-content: flex-start; gap: 1.5rem;
 		opacity: 0; transform: translateX(14px);
 		transition: opacity 360ms ease, transform 620ms cubic-bezier(0.32, 0.72, 0, 1);
 	}

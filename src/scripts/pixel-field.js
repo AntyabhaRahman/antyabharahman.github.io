@@ -169,21 +169,31 @@ export function mountPixelField(canvas, options) {
 		start();
 	}
 
+	// A selection lights the margins beside the selected lines, not the cells under the text.
+	// The browser highlight already marks the text itself, and ink over cells is hard to read.
+	const MARGIN_CELLS = 8;
 	function applySelection() {
 		const sel = document.getSelection();
 		if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
 		const box = canvas.getBoundingClientRect();
+		const column = (document.querySelector('.prose') || document.body).getBoundingClientRect();
+		const leftEdge = Math.floor((column.left - box.left) / PITCH) - 1;
+		const rightEdge = Math.ceil((column.right - box.left) / PITCH) + 1;
+		const spans = [
+			[Math.max(0, leftEdge - MARGIN_CELLS), Math.min(cols - 1, leftEdge)],
+			[Math.max(0, rightEdge), Math.min(cols - 1, rightEdge + MARGIN_CELLS)],
+		];
 		const rects = sel.getRangeAt(0).getClientRects();
 		for (let r = 0; r < rects.length; r++) {
 			const b = rects[r];
-			const x0 = Math.max(0, Math.floor((b.left - box.left) / PITCH) - 1);
-			const x1 = Math.min(cols - 1, Math.ceil((b.right - box.left) / PITCH) + 1);
-			const y0 = Math.max(0, Math.floor((b.top - box.top) / PITCH) - 1);
-			const y1 = Math.min(rows - 1, Math.ceil((b.bottom - box.top) / PITCH) + 1);
+			const y0 = Math.max(0, Math.floor((b.top - box.top) / PITCH));
+			const y1 = Math.min(rows - 1, Math.ceil((b.bottom - box.top) / PITCH));
 			for (let y = y0; y <= y1; y++) {
 				const row = y * cols;
-				for (let x = x0; x <= x1; x++) {
-					if (energy[row + x] < 0.9) energy[row + x] = 0.9;
+				for (const [x0, x1] of spans) {
+					for (let x = x0; x <= x1; x++) {
+						if (energy[row + x] < 0.9) energy[row + x] = 0.9;
+					}
 				}
 			}
 		}
