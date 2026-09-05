@@ -253,8 +253,10 @@ function lightUp() {
 	document.body.appendChild(canvas);
 	for (const b of borders) document.body.appendChild(b.canvas);
 	const ctxText = canvas.getContext('2d');
-	// Pointer interaction waits until every word and border is solid. px-live goes on before
-	// px-wait comes off, in one task, so the marks move from hidden to hidden.
+	// Both pointer and keyboard interaction wait for solid text. Include hidden deck bodies
+	// so focus cannot expand a panel during the entrance; preserve existing inert states.
+	const locked = [...document.querySelectorAll('[data-px], .deck, .theme-toggle')].filter((el) => !el.inert);
+	for (const el of locked) el.inert = true;
 	html.classList.add('px-live');
 	html.classList.remove('px-wait');
 
@@ -324,6 +326,7 @@ function lightUp() {
 			}
 		}
 		document.documentElement.classList.remove('px-live');
+		for (const el of locked) el.inert = false;
 	}
 	requestAnimationFrame(frame);
 }

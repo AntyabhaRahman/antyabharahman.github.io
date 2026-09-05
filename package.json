@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "node scripts/check-pixel-field.mjs"
+    "test": "node scripts/check-pixel-field.mjs && node scripts/check-pixel-entrance.mjs"
   },
   "dependencies": {
     "astro": "^5.18.2",

@@ -1,7 +1,7 @@
 ---
 // Sun and moon drawn as loose ink strokes. The swap uses the View Transition API when the browser has it.
 ---
-<button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+<button class="theme-toggle" type="button" aria-label="Switch to dark mode">
 	<svg viewBox="0 0 24 24" aria-hidden="true">
 		<g class="sun">
 			<path d="M12 7.4 C18.1 7.1 18.4 16.5 12.2 16.7 C6 17 5.9 7.8 12 7.4Z" />
@@ -14,7 +14,7 @@
 <style>
 	.theme-toggle {
 		width: 2.2rem; height: 2.2rem; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer;
-		display: grid; place-items: center; border-radius: 50%;
+		flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%;
 	}
 	@media (hover: none) { .theme-toggle { width: 2.75rem; height: 2.75rem; } }
 	.theme-toggle svg { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.78; stroke-linecap: round; stroke-linejoin: round; }
@@ -30,7 +30,6 @@
 
 	function sync() {
 		const dark = root.dataset.theme === 'dark';
-		btn.setAttribute('aria-pressed', String(dark));
 		btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
 	}
 
@@ -47,8 +46,10 @@
 	btn.addEventListener('click', () => {
 		const r = btn.getBoundingClientRect();
 		origin = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-		root.style.setProperty('--vt-x', `${origin.x}px`);
-		root.style.setProperty('--vt-y', `${origin.y}px`);
+		// As percentages of the viewport. Chromium renders px in the wipe's clip-path at half
+		// scale, which put the circle at the top centre. Percentages land on the button.
+		root.style.setProperty('--vt-x', `${(origin.x / innerWidth) * 100}%`);
+		root.style.setProperty('--vt-y', `${(origin.y / innerHeight) * 100}%`);
 		if ('startViewTransition' in document) {
 			(document as any).startViewTransition(apply);
 		} else {
