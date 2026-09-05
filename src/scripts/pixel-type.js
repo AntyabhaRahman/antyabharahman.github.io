@@ -5,8 +5,8 @@
 // the raster is fully opaque, so the swap has nothing left to show.
 
 const RAMP = 200; // ms for one cell to go from light grey to ink
-const SWEEP = 460; // ms for the sweep to cross the viewport
-const JITTER = 130;
+const SWEEP = 320; // ms for the sweep to cross the viewport
+const JITTER = 90;
 const FADE = 260; // ms for a lit word to cross over from cells to glyphs
 
 function wrapWords(el) {
