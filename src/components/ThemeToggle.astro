@@ -34,17 +34,21 @@
 		btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
 	}
 
+	// The button centre in viewport px. The CSS wipe and the field's colour wave both start there.
+	let origin = { x: 0, y: 0 };
+
 	function apply() {
 		root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
 		localStorage.setItem('theme', root.dataset.theme);
 		sync();
-		document.dispatchEvent(new CustomEvent('themechange'));
+		document.dispatchEvent(new CustomEvent('themechange', { detail: origin }));
 	}
 
 	btn.addEventListener('click', () => {
 		const r = btn.getBoundingClientRect();
-		root.style.setProperty('--vt-x', `${r.left + r.width / 2}px`);
-		root.style.setProperty('--vt-y', `${r.top + r.height / 2}px`);
+		origin = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+		root.style.setProperty('--vt-x', `${origin.x}px`);
+		root.style.setProperty('--vt-y', `${origin.y}px`);
 		if ('startViewTransition' in document) {
 			(document as any).startViewTransition(apply);
 		} else {

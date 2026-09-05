@@ -20,6 +20,19 @@ const TRAIL_LIFE = 10; // seconds a trail cell can survive
 const HOLD = 3.5; // seconds to rest in a basin before a restart
 const LOOP = 60; // seconds for one full cycle of the terrain
 
+// The CSS theme wipe runs on cubic-bezier(0.2, 0.8, 0.2, 1). This returns its y for a time x.
+export function wipeEase(x) {
+	const bx = (t) => 3 * 0.2 * t * (1 - t) * (1 - t) + 3 * 0.2 * t * t * (1 - t) + t * t * t;
+	const by = (t) => 3 * 0.8 * t * (1 - t) * (1 - t) + 3 * 1 * t * t * (1 - t) + t * t * t;
+	let lo = 0, hi = 1;
+	for (let i = 0; i < 24; i++) {
+		const mid = (lo + hi) / 2;
+		if (bx(mid) < x) lo = mid;
+		else hi = mid;
+	}
+	return by((lo + hi) / 2);
+}
+
 export function spawnPoint(cols, rows, side) {
 	return [cols * (side > 0 ? 0.88 : 0.12), rows * (side > 0 ? 0.12 : 0.88)];
 }
@@ -33,7 +46,7 @@ export function mountPixelField(canvas, options) {
 	const ctx = canvas.getContext('2d');
 	if (!ctx) return { destroy() {} };
 	const parent = canvas.parentElement || canvas;
-	const ink = ['', '', '', '', '', ''];
+	let ink = ['', '', '', '', '', ''];
 	let paper = '#ffffff';
 
 	let cols = 0, rows = 0, cssW = 0, cssH = 0;
@@ -41,11 +54,17 @@ export function mountPixelField(canvas, options) {
 	let band = new Uint8Array(0);
 	let visit = new Float32Array(0); // last time the optimizer crossed a cell
 	let order = new Int32Array(0); // cell indices grouped by shade, rebuilt on a full paint
-	const counts = new Int32Array(6), starts = new Int32Array(6);
+	const counts = new Int32Array(11), starts = new Int32Array(11);
+	let key = new Uint8Array(0); // bucket per cell for the full paint
 	let shown = new Uint8Array(0); // the band each cell was last painted with
 	let dirty = new Uint8Array(0), dirtyList = new Int32Array(0); // cells to repaint this frame
 	let full = true; // the next paint clears and redraws everything
 	let headBox = [0, 0, 0, 0]; // cell range under the last painted head: x0, y0, x1, y1
+	// A theme change recolours the field as a ring that grows from the toggle button. Cells
+	// inside the ring take the new palette; cells outside keep the old one until it passes.
+	let wave = null; // { ox, oy, t0, rmax } in canvas px and real milliseconds, the CSS wipe's clock
+	let inkOld = ink, paperOld = paper;
+	const WAVE = 0.52; // seconds, the length of the CSS theme wipe
 	let hash = new Float32Array(0); // fixed per-cell value in [0, 1) that picks the contour dots
 	let time = 0, last = 0, frameId = 0;
 	let live = false; // true while some pointer energy is still worth drawing
@@ -60,8 +79,7 @@ export function mountPixelField(canvas, options) {
 	function readColors() {
 		const style = getComputedStyle(canvas);
 		const bands = style.getPropertyValue('--pf-bands').split(',').map((c) => c.trim());
-		for (let i = 0; i < 4; i++) ink[i + 1] = bands[i];
-		ink[5] = style.getPropertyValue('--pf-accent').trim();
+		ink = ['', bands[0], bands[1], bands[2], bands[3], style.getPropertyValue('--pf-accent').trim()];
 		paper = style.getPropertyValue('--paper').trim();
 	}
 
@@ -97,6 +115,7 @@ export function mountPixelField(canvas, options) {
 			hash = new Float32Array(n);
 			order = new Int32Array(n);
 			shown = new Uint8Array(n);
+			key = new Uint8Array(n);
 			dirty = new Uint8Array(n);
 			dirtyList = new Int32Array(n);
 			let seed = 1234567;
@@ -254,6 +273,22 @@ export function mountPixelField(canvas, options) {
 		}
 	}
 
+	// The ring radius right now, or Infinity when no wave runs.
+	function waveRadius() {
+		if (!wave) return Infinity;
+		const p = (performance.now() - wave.t0) / (WAVE * 1000);
+		if (p >= 1) {
+			wave = null;
+			return Infinity;
+		}
+		return wave.rmax * wipeEase(Math.max(0, p));
+	}
+	function inside(x, y, r) {
+		if (!wave) return true;
+		const dx = x * PITCH + SQUARE / 2 - wave.ox, dy = y * PITCH + SQUARE / 2 - wave.oy;
+		return dx * dx + dy * dy <= r * r;
+	}
+
 	function dot(i) {
 		const y = (i / cols) | 0, x = i - y * cols;
 		ctx.fillRect(x * PITCH + SQUARE / 2, y * PITCH + SQUARE / 2, 1.5, 1.5);
@@ -275,11 +310,12 @@ export function mountPixelField(canvas, options) {
 		const age = time - spawn;
 		const slot = age < 0.2 ? 1 : age < 0.4 ? 2 : age < 0.6 ? 3 : age < 0.8 ? 4 : 5;
 		const hx = Math.round(q[0]) * PITCH, hy = Math.round(q[1]) * PITCH;
+		const neu = inside(Math.round(q[0]), Math.round(q[1]), waveRadius());
 		if (slot === 5) {
-			ctx.fillStyle = paper;
+			ctx.fillStyle = neu ? paper : paperOld;
 			ctx.fillRect(hx - 2, hy - 2, 2 * PITCH + 3, 2 * PITCH + 3);
 		}
-		ctx.fillStyle = ink[slot];
+		ctx.fillStyle = (neu ? ink : inkOld)[slot];
 		ctx.fillRect(hx, hy, 2 * PITCH - 1, 2 * PITCH - 1);
 		headBox = headRange();
 	}
@@ -287,17 +323,25 @@ export function mountPixelField(canvas, options) {
 	function paintAll() {
 		ctx.clearRect(0, 0, cssW, cssH);
 		const n = cols * rows;
+		const r = waveRadius();
 		// A counting sort groups the lit cells by shade, so each shade walks only its own cells
-		// instead of the whole grid.
+		// instead of the whole grid. During a theme wave the old palette gets five more buckets.
 		counts.fill(0);
-		for (let i = 0; i < n; i++) counts[band[i]]++;
-		for (let s = 1, at = 0; s <= 5; s++) {
+		for (let i = 0; i < n; i++) {
+			const b = band[i];
+			if (!b) continue;
+			const y = (i / cols) | 0;
+			const k = inside(i - y * cols, y, r) ? b : b + 5;
+			key[i] = k;
+			counts[k]++;
+		}
+		for (let s = 1, at = 0; s <= 10; s++) {
 			starts[s] = at;
 			at += counts[s];
 		}
-		for (let i = 0; i < n; i++) if (band[i]) order[starts[band[i]]++] = i;
-		for (let s = 1, at = 0; s <= 5; s++) {
-			ctx.fillStyle = ink[s];
+		for (let i = 0; i < n; i++) if (band[i]) order[starts[key[i]]++] = i;
+		for (let s = 1, at = 0; s <= 10; s++) {
+			ctx.fillStyle = s <= 5 ? ink[s] : inkOld[s - 5];
 			for (const end = at + counts[s]; at < end; at++) {
 				const i = order[at];
 				const y = (i / cols) | 0;
@@ -305,12 +349,13 @@ export function mountPixelField(canvas, options) {
 			}
 		}
 		if (!trail) {
-			ctx.fillStyle = ink[5];
 			ctx.globalAlpha = 0.32;
 			for (let y = 0; y < rows - 1; y++) {
 				for (let x = 0; x < cols - 1; x++) {
 					const i = y * cols + x;
-					if (isContourDot(band, cols, i, hash)) dot(i);
+					if (!isContourDot(band, cols, i, hash)) continue;
+					ctx.fillStyle = inside(x, y, r) ? ink[5] : inkOld[5];
+					dot(i);
 				}
 			}
 			ctx.globalAlpha = 1;
@@ -407,14 +452,15 @@ export function mountPixelField(canvas, options) {
 		time += dt;
 		decay(dt);
 		if (!trail) advance(dt);
+		if (wave) full = true;
 		compose();
 		paint();
-		if (trail && !live) stop();
+		if (trail && !live && !wave) stop();
 	}
 
 	function start() {
 		if (frameId || !onScreen || cols === 0) return;
-		if (trail && !live) return;
+		if (trail && !live && !wave) return;
 		last = performance.now();
 		frameId = requestAnimationFrame(frame);
 	}
@@ -424,10 +470,20 @@ export function mountPixelField(canvas, options) {
 		frameId = 0;
 	}
 
-	function onTheme() {
+	function onTheme(ev) {
+		inkOld = ink.slice();
+		paperOld = paper;
 		readColors();
+		const d = ev && ev.detail;
+		if (d && cols && typeof d.x === 'number') {
+			const box = canvas.getBoundingClientRect();
+			// The CSS wipe ends at circle(150%), a radius of 1.5 times the viewport diagonal over root 2.
+			wave = { ox: d.x - box.left, oy: d.y - box.top, t0: performance.now(), rmax: 1.5 * Math.hypot(innerWidth, innerHeight) / Math.SQRT2 };
+		}
 		full = true;
-		if (!frameId) redraw();
+		if (frameId) return;
+		if (wave) start();
+		else redraw();
 	}
 
 	readColors();
