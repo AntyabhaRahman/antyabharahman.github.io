@@ -36,7 +36,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 				<ol class="panel-items">
 					{p.items.map((it, j) => (
 						<li>
-							<a class="u u--bare" href={it.href}>{it.title}</a>
+							<a class="u" href={it.href}>{it.title}</a>
 							{j === 0 && <Note dir="left">newest</Note>}
 							<span class="hand">{fmt(it.date)}</span>
 						</li>
@@ -58,14 +58,14 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 <style>
 	.deck {
 		display: flex; gap: 1.25rem; align-items: flex-start;
-		flex: 1 1 auto; height: auto; min-height: 20rem;
+		flex: 1 1 auto; min-height: 20rem;
 		position: relative; z-index: 1;
 		container-type: size;
 	}
 	/* A sheet is as long as its section: a base for the spine plus 4rem per entry. The hero
 	   caps it, and the field runs on below the shorter sheets. */
-	.panel { height: min(var(--deck-h, 100cqh), calc(28rem + var(--n, 0) * 4rem)); }
 	.panel {
+		height: min(var(--deck-h, 100cqh), calc(28rem + var(--n, 0) * 4rem));
 		flex: 1 1 0; min-width: 5.5rem;
 		background: color-mix(in srgb, var(--paper) 78%, transparent); box-shadow: var(--shadow);
 		display: grid; grid-template-columns: auto 1fr; grid-template-rows: minmax(0, 1fr); overflow: hidden;
@@ -75,25 +75,24 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.deck:has(.panel:hover) .panel, .deck:has(.panel:focus-within) .panel { transform: rotate(0deg); }
 	.panel:hover, .panel:focus-within { flex-grow: 3.2; transform: rotate(0deg) translateY(-4px); background: color-mix(in srgb, var(--paper) 96%, transparent); }
 	.deck:has(.panel:focus-within) .panel:hover:not(:focus-within) { flex-grow: 1; }
-	.panel-side { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; gap: 1rem; padding: 1.3rem 0.9rem; }
+	.panel-side { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1.3rem 0.9rem; }
 	.panel-draw { width: 3rem; height: 3rem; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1); }
 	.panel-draw .hatch { stroke: var(--graphite); stroke-width: 0.7; opacity: 0.7; }
 	.panel:hover .panel-draw, .panel:focus-within .panel-draw { transform: rotate(-3deg); }
 	.panel-title {
-		margin: 0; font-size: clamp(1.7rem, 4vw, 3.2rem);
+		margin: auto 0 0; font-size: clamp(1.7rem, 4vw, 3.2rem); flex-shrink: 0;
 		writing-mode: vertical-rl; transform: rotate(180deg); line-height: 1;
 	}
 	.panel-title a { display: block; }
 	.panel-body {
 		padding: 2rem 2rem 2rem 0.75rem; min-width: 18rem;
-		display: flex; flex-direction: column; justify-content: flex-start; gap: 1.5rem;
+		display: flex; flex-direction: column; gap: 1.5rem;
 		opacity: 0; transform: translateX(14px);
 		transition: opacity 360ms ease, transform 620ms cubic-bezier(0.32, 0.72, 0, 1);
 	}
 	.panel:hover .panel-body, .panel:focus-within .panel-body { opacity: 1; transform: none; transition-delay: 160ms; }
 	.panel-stack { display: flex; flex-direction: column; gap: 1rem; }
 	.panel-spec { margin: 0; display: flex; justify-content: flex-end; gap: 1.15rem; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; flex: 0 1 auto; min-height: 0; overflow: hidden; }
-	.panel-title { flex-shrink: 0; }
 	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 	@media (max-height: 820px) and (min-width: 901px) { .panel-title { font-size: 2.4rem; } }
 	/* A short window has no room on the spine for the spec. */
@@ -107,18 +106,14 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.panel-items .hand { font-size: 0.7rem; }
 	.panel-all { align-self: flex-start; font-size: 0.95rem; }
 
-	@media (hover: none) {
-		.panel-body { opacity: 1; transform: none; }
-	}
 	@media (hover: none), (max-width: 900px) {
 		.deck { flex-direction: column; flex: none; height: auto; min-height: 0; container-type: normal; }
-		.panel { flex: none; height: auto; transform: none; grid-template-columns: 1fr; }
-		.panel { background: var(--paper); }
+		.panel { flex: none; height: auto; transform: none; grid-template-columns: 1fr; background: var(--paper); }
 		.panel:hover, .panel:focus-within { flex: none; transform: none; }
 		.panel-side { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 1.2rem 1.2rem 0; }
 		.panel-draw { grid-column: 2; grid-row: 1; }
-		.panel-title { grid-column: 1; grid-row: 1; writing-mode: horizontal-tb; transform: none; font-size: clamp(1.55rem, 8vw, 2rem); min-width: 0; }
-		.panel-spec { grid-column: 1 / -1; grid-row: 2; margin: 0; flex: none; overflow: visible; writing-mode: horizontal-tb; transform: none; justify-content: flex-start; flex-wrap: wrap; }
+		.panel-title { grid-column: 1; grid-row: 1; margin: 0; writing-mode: horizontal-tb; transform: none; font-size: clamp(1.55rem, 8vw, 2rem); min-width: 0; }
+		.panel-spec { grid-column: 1 / -1; grid-row: 2; flex: none; overflow: visible; writing-mode: horizontal-tb; transform: none; justify-content: flex-start; flex-wrap: wrap; }
 		.panel-spec > div { gap: 0.25rem; }
 		.panel-body { opacity: 1; transform: none; padding: 1rem 1.2rem 1.4rem; min-width: 0; }
 	}

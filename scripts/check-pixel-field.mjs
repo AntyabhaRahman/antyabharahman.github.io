@@ -24,19 +24,8 @@ const canvas = {
 	parentElement: parent,
 	style: {},
 };
-const motion = { matches: false, addEventListener() {}, removeEventListener() {} };
-globalThis.window = {
-	devicePixelRatio: 1,
-	matchMedia: () => motion,
-	addEventListener() {},
-	removeEventListener() {},
-};
-globalThis.document = {
-	hidden: false,
-	getSelection: () => ({ isCollapsed: true }),
-	addEventListener() {},
-	removeEventListener() {},
-};
+globalThis.window = { devicePixelRatio: 1, addEventListener() {}, removeEventListener() {} };
+globalThis.document = { addEventListener() {}, removeEventListener() {} };
 globalThis.getComputedStyle = () => ({
 	getPropertyValue: (name) => name === '--paper' ? '#fff' : name === '--pf-accent' ? '#000' : '#ddd, #aaa, #777, #444',
 });

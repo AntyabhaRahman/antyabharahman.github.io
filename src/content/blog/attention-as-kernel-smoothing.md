@@ -3,6 +3,7 @@ title: Attention as kernel smoothing
 description: Self attention computes a Nadaraya Watson average with an exponential inner product kernel whose bandwidth is set by the head width.
 date: 2026-04-14
 tags: [attention, kernels]
+note: At head width 64, the equivalent bandwidth is about 2.83.
 ---
 
 <!-- Placeholder. Replace this file with your own content. Keep the frontmatter keys. -->

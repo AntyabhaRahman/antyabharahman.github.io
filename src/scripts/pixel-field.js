@@ -1,13 +1,12 @@
 // Reactive pixel field on a 2D canvas.
-// One grid, two modes. 'ambient' draws a loss landscape as contour rings with an
-// optimizer that descends it. 'trail' draws only the pointer trail.
+// One grid, two modes. 'ambient' draws a terrain as height bands with an optimizer that
+// descends it. 'trail' draws only the pointer trail.
 
 const PITCH = 9; // cell pitch in CSS px: an 8 px square plus a 1 px gap
 const SQUARE = 8;
 const BRUSH = 7; // brush radius in cells
 const DECAY = 9.2; // energy falls to one percent in half a second
 const MAX_STEPS = 64; // stamps per pointer segment
-const FALLBACK = ['#dedcd7', '#b0ada7', '#7a7773', '#403e3a'];
 
 // Terrain and optimizer constants. The terrain is layered sine waves with coordinate
 // warping. Height runs 0 to 1. Low is dark, so the ball sinks into ink pools.
@@ -30,20 +29,18 @@ export function isContourDot(bands, cols, i, hash) {
 }
 
 export function mountPixelField(canvas, options) {
-	const trail = (options && options.mode) === 'trail';
+	const trail = options?.mode === 'trail';
 	const ctx = canvas.getContext('2d');
 	if (!ctx) return { destroy() {} };
 	const parent = canvas.parentElement || canvas;
-	// Motion runs regardless of the Reduce Motion setting, by the owner's choice on 2026-09-05.
-	const motion = { matches: false, addEventListener() {}, removeEventListener() {} };
-	const ink = [null, FALLBACK[0], FALLBACK[1], FALLBACK[2], FALLBACK[3], '#000000'];
+	const ink = ['', '', '', '', '', ''];
 	let paper = '#ffffff';
 
 	let cols = 0, rows = 0, cssW = 0, cssH = 0, lastDpr = 0;
 	let energy = new Float32Array(0);
 	let band = new Uint8Array(0);
 	let visit = new Float32Array(0); // last time the optimizer crossed a cell
-	let hash = new Float32Array(0); // fixed per-cell value in [0, 1) for trail fade
+	let hash = new Float32Array(0); // fixed per-cell value in [0, 1) that picks the contour dots
 	let time = 0, last = 0, frameId = 0;
 	let live = false; // true while some pointer energy is still worth drawing
 	let onScreen = true;
@@ -53,30 +50,13 @@ export function mountPixelField(canvas, options) {
 	let side = 1; // 1 starts the ball in the right margin, -1 in the left
 	let q = [0, 0], v = [0, 0];
 	let stepClock = 0, calm = 0, rest = 0, spawn = 0;
-	let warp = new Float32Array(0);
-
-	function splitList(value) {
-		const out = [];
-		let depth = 0, start = 0;
-		for (let i = 0; i < value.length; i++) {
-			const c = value[i];
-			if (c === '(') depth++;
-			else if (c === ')') depth--;
-			else if (c === ',' && depth === 0) {
-				out.push(value.slice(start, i).trim());
-				start = i + 1;
-			}
-		}
-		out.push(value.slice(start).trim());
-		return out.filter(Boolean);
-	}
 
 	function readColors() {
 		const style = getComputedStyle(canvas);
-		const bands = splitList(style.getPropertyValue('--pf-bands'));
-		for (let i = 0; i < 4; i++) ink[i + 1] = bands[i] || FALLBACK[i];
-		ink[5] = style.getPropertyValue('--pf-accent').trim() || FALLBACK[3];
-		paper = style.getPropertyValue('--paper').trim() || paper;
+		const bands = style.getPropertyValue('--pf-bands').split(',').map((c) => c.trim());
+		for (let i = 0; i < 4; i++) ink[i + 1] = bands[i];
+		ink[5] = style.getPropertyValue('--pf-accent').trim();
+		paper = style.getPropertyValue('--paper').trim();
 	}
 
 	// Alternate between opposite corners so the descent can cross the whole field.
@@ -97,7 +77,6 @@ export function mountPixelField(canvas, options) {
 		cssW = w;
 		cssH = h;
 		lastDpr = dpr;
-		canvas.style.display = 'block';
 		canvas.style.width = w + 'px';
 		canvas.style.height = h + 'px';
 		canvas.width = Math.round(w * dpr);
@@ -119,11 +98,7 @@ export function mountPixelField(canvas, options) {
 			live = false;
 		}
 		hasPrev = false;
-		if (warp.length !== cols) warp = new Float32Array(cols);
-		if (!trail) {
-			startBall();
-			if (motion.matches) staticDescent();
-		}
+		if (!trail) startBall();
 		redraw();
 	}
 
@@ -146,7 +121,7 @@ export function mountPixelField(canvas, options) {
 	}
 
 	function onPointerMove(ev) {
-		if (ev.pointerType === 'touch' || motion.matches || cols === 0) return;
+		if (ev.pointerType === 'touch' || cols === 0) return;
 		const box = canvas.getBoundingClientRect();
 		const cx = (ev.clientX - box.left) / PITCH;
 		const cy = (ev.clientY - box.top) / PITCH;
@@ -240,12 +215,6 @@ export function mountPixelField(canvas, options) {
 		}
 	}
 
-	// Reduced motion: one settled descent, drawn once and never animated.
-	function staticDescent() {
-		startBall();
-		for (let i = 0; i < 120; i++) optimizerStep();
-	}
-
 	function compose() {
 		const n = cols * rows;
 		if (trail) {
@@ -331,10 +300,6 @@ export function mountPixelField(canvas, options) {
 
 	function redraw() {
 		if (cols === 0) return;
-		if (trail && motion.matches) {
-			ctx.clearRect(0, 0, cssW, cssH);
-			return;
-		}
 		compose();
 		paint();
 	}
@@ -352,7 +317,7 @@ export function mountPixelField(canvas, options) {
 	}
 
 	function start() {
-		if (frameId || motion.matches || document.hidden || !onScreen || cols === 0) return;
+		if (frameId || !onScreen || cols === 0) return;
 		if (trail && !live) return;
 		last = performance.now();
 		frameId = requestAnimationFrame(frame);
@@ -363,21 +328,9 @@ export function mountPixelField(canvas, options) {
 		frameId = 0;
 	}
 
-	function onVisibility() {
-		if (document.hidden) stop();
-		else start();
-	}
-
 	function onTheme() {
 		readColors();
 		if (!frameId) redraw();
-	}
-
-	function onMotion() {
-		stop();
-		if (!trail && motion.matches) staticDescent();
-		redraw();
-		start();
 	}
 
 	readColors();
@@ -390,10 +343,7 @@ export function mountPixelField(canvas, options) {
 	});
 	viewWatch.observe(canvas);
 	window.addEventListener('pointermove', onPointerMove, { passive: true });
-	window.addEventListener('resize', resize);
-	document.addEventListener('visibilitychange', onVisibility);
 	document.addEventListener('themechange', onTheme);
-	motion.addEventListener('change', onMotion);
 	resize();
 	start();
 
@@ -403,10 +353,7 @@ export function mountPixelField(canvas, options) {
 			sizeWatch.disconnect();
 			viewWatch.disconnect();
 			window.removeEventListener('pointermove', onPointerMove);
-			window.removeEventListener('resize', resize);
-			document.removeEventListener('visibilitychange', onVisibility);
 			document.removeEventListener('themechange', onTheme);
-			motion.removeEventListener('change', onMotion);
 		},
 	};
 }

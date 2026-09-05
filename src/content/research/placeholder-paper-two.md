@@ -6,7 +6,6 @@ date: 2026-07-11
 description: Quantizing Adam's second moment to 8 bits interacts with bias correction in the first thousand steps and costs accuracy unless the correction is applied before quantization.
 arxiv: https://example.com
 code: https://example.com
-tags: [optimization]
 ---
 
 <!-- Placeholder. Replace this file with your own content. Keep the frontmatter keys. -->

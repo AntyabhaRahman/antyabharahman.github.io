@@ -7,7 +7,6 @@ description: Treating the attention temperature as a kernel bandwidth and anneal
 pdf: https://example.com
 arxiv: https://example.com
 code: https://example.com
-tags: [attention]
 ---
 
 <!-- Placeholder. Replace this file with your own content. Keep the frontmatter keys. -->

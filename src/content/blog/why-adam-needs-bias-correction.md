@@ -3,6 +3,7 @@ title: Why Adam needs bias correction
 description: Adam starts both moment estimates at zero, and the geometric sum that follows explains the 1 minus beta to the t divisor.
 date: 2026-06-02
 tags: [optimization, adam]
+note: At beta two 0.999, the raw second moment is still 37 percent low at step 1000.
 ---
 
 <!-- Placeholder. Replace this file with your own content. Keep the frontmatter keys. -->

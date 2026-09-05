@@ -1,7 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
+import { byDate } from '../../utils';
 import Base from '../../layouts/Base.astro';
-const papers = (await getCollection('research')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const papers = (await getCollection('research')).sort(byDate);
 ---
 <Base title="Research · Antyabha Rahman" description="Papers and preprints by Antyabha Rahman.">
 	<main class="wrap">

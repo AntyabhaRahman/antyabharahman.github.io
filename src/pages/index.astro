@@ -3,19 +3,21 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Deck from '../components/Deck.astro';
 import PixelCanvas from '../components/PixelCanvas.astro';
+import { byDate } from '../utils';
 
-const section = async (name: 'projects' | 'blog' | 'research', prefix: string) => {
-	const all = (await getCollection(name)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const section = async (name: 'projects' | 'blog' | 'research') => {
+	const all = (await getCollection(name)).sort(byDate);
 	return {
+		href: `/${name}/`,
 		count: all.length,
-		items: all.slice(0, 3).map((e) => ({ href: `${prefix}${e.id}/`, title: e.data.title, date: e.data.date })),
+		items: all.slice(0, 3).map((e) => ({ href: `/${name}/${e.id}/`, title: e.data.title, date: e.data.date })),
 	};
 };
 
 const panels = [
-	{ href: '/projects/', title: 'Projects', blurb: 'Things I built. Code, tools, and the occasional hardware.', ...(await section('projects', '/projects/')) },
-	{ href: '/blog/', title: 'Blog', blurb: 'Working notes on machine learning and maths. Equations included.', ...(await section('blog', '/blog/')) },
-	{ href: '/research/', title: 'Research', blurb: 'Papers and preprints, with the short version of each.', ...(await section('research', '/research/')) },
+	{ title: 'Projects', blurb: 'Things I built. Code, tools, and the occasional hardware.', ...(await section('projects')) },
+	{ title: 'Blog', blurb: 'Working notes on machine learning and maths. Equations included.', ...(await section('blog')) },
+	{ title: 'Research', blurb: 'Papers and preprints, with the short version of each.', ...(await section('research')) },
 ];
 ---
 <Base title="Antyabha Rahman">

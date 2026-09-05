@@ -158,11 +158,10 @@ function sampleBorder(el, dpr) {
 	return { el, canvas, ctx: canvas.getContext('2d'), place, cells, cell, color, border: true };
 }
 
-export function lightUp() {
+function lightUp() {
 	document.documentElement.classList.remove('px-wait');
 	// The site runs its motion regardless of the Reduce Motion setting. The owner chose this on
 	// 2026-09-05 so every browser shows the same page.
-	const sweep = SWEEP, jitter = JITTER, ramp = RAMP, fadeMs = FADE;
 	// A hidden host, such as a deck body at rest on desktop, gets no cells. Its text would
 	// otherwise light up over an empty sheet.
 	const targets = [...document.querySelectorAll('[data-px]')].filter((t) => getComputedStyle(t).opacity !== '0');
@@ -180,8 +179,8 @@ export function lightUp() {
 		for (let k = 0; k < wd.delay.length; k++) {
 			const pt = wd.place.transformPoint({ x: wd.cells[2 * k], y: wd.cells[2 * k + 1] });
 			// The front runs from the top left corner to the bottom right, so no column lights as one line.
-			wd.delay[k] = ((pt.x / innerWidth) * 0.65 + (pt.y / innerHeight) * 0.35) * sweep + Math.random() * jitter;
-			wd.ready = Math.max(wd.ready, wd.delay[k] + ramp);
+			wd.delay[k] = ((pt.x / innerWidth) * 0.65 + (pt.y / innerHeight) * 0.35) * SWEEP + Math.random() * JITTER;
+			wd.ready = Math.max(wd.ready, wd.delay[k] + RAMP);
 		}
 		if (wd.span) wd.span.style.color = 'transparent';
 	}
@@ -210,7 +209,7 @@ export function lightUp() {
 		let done = true;
 		for (const wd of words) {
 			if (wd.finished) continue;
-			const fade = Math.min(1, (t - wd.ready) / fadeMs);
+			const fade = Math.min(1, (t - wd.ready) / FADE);
 			const ctx = wd.border ? wd.ctx : ctxText;
 			if (wd.border) {
 				ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -238,7 +237,7 @@ export function lightUp() {
 			ctx.globalAlpha = down;
 			const c = wd.cell;
 			for (let k = 0; k < wd.delay.length; k++) {
-				const p = (t - wd.delay[k]) / ramp;
+				const p = (t - wd.delay[k]) / RAMP;
 				if (p <= 0) continue;
 				ctx.fillStyle = p < 1 / 3 ? stages[0] : p < 2 / 3 ? stages[1] : wd.color;
 				ctx.fillRect(wd.cells[2 * k], wd.cells[2 * k + 1], c - 1, c - 1);

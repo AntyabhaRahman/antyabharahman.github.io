@@ -8,15 +8,11 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const fmt = post.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-const notes: Record<string, string> = {
-	'attention-as-kernel-smoothing': 'At head width 64, the equivalent bandwidth is about 2.83.',
-	'why-adam-needs-bias-correction': 'At beta two 0.999, the raw second moment is still 37 percent low at step 1000.',
-};
 ---
 <Article title={post.data.title} description={post.data.description} kicker={fmt} backHref="/blog/" backLabel="all posts">
 	<div class="meta" slot="meta">
 		{post.data.tags.map((t) => <span class="tag"><span class="tag-hash">#</span>{t}</span>)}
 	</div>
-	{notes[post.id] && <Note slot="notes" dir="right">{notes[post.id]}</Note>}
+	{post.data.note && <Note slot="notes" dir="right">{post.data.note}</Note>}
 	<Content />
 </Article>

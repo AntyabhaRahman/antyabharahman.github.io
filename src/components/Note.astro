@@ -1,14 +1,20 @@
 ---
 // A margin note: hand lettering with a small drawn arrow.
-interface Props { dir?: 'left' | 'right'; class?: string; }
-const { dir = 'left', class: cls = '' } = Astro.props;
+interface Props { dir?: 'left' | 'right'; }
+const { dir = 'left' } = Astro.props;
 const arrows = {
 	left: 'M22 6 Q14 3 3 8 M7 3 L3 8 L9 10',
 	right: 'M2 9 Q11 12 21 5 M15 4 L21 5 L18 11',
 };
 ---
-<span class={`note ${cls}`}>
+<span class="note hand">
 	{dir === 'left' && <svg viewBox="0 0 24 14" aria-hidden="true"><path d={arrows.left} /></svg>}
 	<span><slot /></span>
 	{dir === 'right' && <svg viewBox="0 0 24 14" aria-hidden="true"><path d={arrows.right} /></svg>}
 </span>
+
+<style>
+	.note { display: inline-flex; align-items: flex-start; gap: 0.5em; line-height: 1.1; white-space: nowrap; }
+	.note svg { width: 1.6em; height: 1em; margin-top: 0.05em; overflow: visible; }
+	.note svg path { fill: none; stroke: currentColor; stroke-width: 1.2px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+</style>

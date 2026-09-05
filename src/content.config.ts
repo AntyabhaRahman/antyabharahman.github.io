@@ -11,6 +11,7 @@ export const collections = {
 			description: z.string(),
 			date: z.coerce.date(),
 			tags: z.array(z.string()).default([]),
+			note: z.string().optional(), // one margin note shown beside the post
 		}),
 	}),
 	research: defineCollection({
@@ -24,7 +25,6 @@ export const collections = {
 			pdf: z.string().url().optional(),
 			arxiv: z.string().url().optional(),
 			code: z.string().url().optional(),
-			tags: z.array(z.string()).default([]),
 		}),
 	}),
 	projects: defineCollection({
