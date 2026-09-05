@@ -36,12 +36,16 @@ export function mountPixelField(canvas, options) {
 	const ink = ['', '', '', '', '', ''];
 	let paper = '#ffffff';
 
-	let cols = 0, rows = 0, cssW = 0, cssH = 0, lastDpr = 0;
+	let cols = 0, rows = 0, cssW = 0, cssH = 0;
 	let energy = new Float32Array(0);
 	let band = new Uint8Array(0);
 	let visit = new Float32Array(0); // last time the optimizer crossed a cell
-	let order = new Int32Array(0); // cell indices grouped by shade, rebuilt every paint
+	let order = new Int32Array(0); // cell indices grouped by shade, rebuilt on a full paint
 	const counts = new Int32Array(6), starts = new Int32Array(6);
+	let shown = new Uint8Array(0); // the band each cell was last painted with
+	let dirty = new Uint8Array(0), dirtyList = new Int32Array(0); // cells to repaint this frame
+	let full = true; // the next paint clears and redraws everything
+	let headBox = [0, 0, 0, 0]; // cell range under the last painted head: x0, y0, x1, y1
 	let hash = new Float32Array(0); // fixed per-cell value in [0, 1) that picks the contour dots
 	let time = 0, last = 0, frameId = 0;
 	let live = false; // true while some pointer energy is still worth drawing
@@ -74,16 +78,15 @@ export function mountPixelField(canvas, options) {
 		const box = parent.getBoundingClientRect();
 		const w = Math.max(1, Math.round(box.width));
 		const h = Math.max(1, Math.round(box.height));
-		const dpr = Math.min(2, window.devicePixelRatio || 1);
-		if (w === cssW && h === cssH && dpr === lastDpr) return;
+		if (w === cssW && h === cssH) return;
 		cssW = w;
 		cssH = h;
-		lastDpr = dpr;
 		canvas.style.width = w + 'px';
 		canvas.style.height = h + 'px';
-		canvas.width = Math.round(w * dpr);
-		canvas.height = Math.round(h * dpr);
-		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+		// One canvas pixel per CSS pixel, on every display. The squares sit on an integer pitch,
+		// so they stay crisp; the backing store is a quarter of the size on a 2x display.
+		canvas.width = w;
+		canvas.height = h;
 		cols = Math.ceil(w / PITCH);
 		rows = Math.ceil(h / PITCH);
 		const n = cols * rows;
@@ -93,6 +96,9 @@ export function mountPixelField(canvas, options) {
 			visit = new Float32Array(n).fill(-1e9);
 			hash = new Float32Array(n);
 			order = new Int32Array(n);
+			shown = new Uint8Array(n);
+			dirty = new Uint8Array(n);
+			dirtyList = new Int32Array(n);
 			let seed = 1234567;
 			for (let i = 0; i < n; i++) {
 				seed = (seed * 1103515245 + 12345) & 0x7fffffff;
@@ -101,6 +107,7 @@ export function mountPixelField(canvas, options) {
 			live = false;
 		}
 		hasPrev = false;
+		full = true;
 		if (!trail) startBall();
 		redraw();
 	}
@@ -247,7 +254,37 @@ export function mountPixelField(canvas, options) {
 		}
 	}
 
-	function paint() {
+	function dot(i) {
+		const y = (i / cols) | 0, x = i - y * cols;
+		ctx.fillRect(x * PITCH + SQUARE / 2, y * PITCH + SQUARE / 2, 1.5, 1.5);
+	}
+
+	// The cell range under the head, outline included. The outline runs 2 px past the head on
+	// every side, so it can touch one more cell.
+	function headRange() {
+		const hx = Math.round(q[0]) * PITCH, hy = Math.round(q[1]) * PITCH;
+		return [
+			Math.max(0, Math.floor((hx - 2) / PITCH)), Math.max(0, Math.floor((hy - 2) / PITCH)),
+			Math.min(cols - 1, Math.floor((hx + 2 * PITCH + 1) / PITCH)), Math.min(rows - 1, Math.floor((hy + 2 * PITCH + 1) / PITCH)),
+		];
+	}
+
+	function paintHead() {
+		// The head lights up through the greys after a restart. A paper outline then
+		// separates it from the darkest band.
+		const age = time - spawn;
+		const slot = age < 0.2 ? 1 : age < 0.4 ? 2 : age < 0.6 ? 3 : age < 0.8 ? 4 : 5;
+		const hx = Math.round(q[0]) * PITCH, hy = Math.round(q[1]) * PITCH;
+		if (slot === 5) {
+			ctx.fillStyle = paper;
+			ctx.fillRect(hx - 2, hy - 2, 2 * PITCH + 3, 2 * PITCH + 3);
+		}
+		ctx.fillStyle = ink[slot];
+		ctx.fillRect(hx, hy, 2 * PITCH - 1, 2 * PITCH - 1);
+		headBox = headRange();
+	}
+
+	function paintAll() {
 		ctx.clearRect(0, 0, cssW, cssH);
 		const n = cols * rows;
 		// A counting sort groups the lit cells by shade, so each shade walks only its own cells
@@ -273,24 +310,71 @@ export function mountPixelField(canvas, options) {
 			for (let y = 0; y < rows - 1; y++) {
 				for (let x = 0; x < cols - 1; x++) {
 					const i = y * cols + x;
-					if (!isContourDot(band, cols, i, hash)) continue;
-					ctx.fillRect(x * PITCH + SQUARE / 2, y * PITCH + SQUARE / 2, 1.5, 1.5);
+					if (isContourDot(band, cols, i, hash)) dot(i);
 				}
 			}
 			ctx.globalAlpha = 1;
+			paintHead();
+		}
+		shown.set(band);
+		full = false;
+	}
+
+	// Only cells whose band changed are repainted. A contour dot at a cell also reads the cells
+	// to its right and below, so a change dirties the cells to its left and above as well. The
+	// head is painted last, so the cells under its old and new box are repainted too.
+	function paint() {
+		// The stylesheet can apply after this module runs, and then the tokens read as empty.
+		// Nothing is drawn until they resolve, and the first paint after that is a full one.
+		if (!ink[1]) {
+			readColors();
+			if (!ink[1]) return;
+			full = true;
+		}
+		if (full) return paintAll();
+		const n = cols * rows;
+		let count = 0;
+		const mark = (i) => {
+			if (dirty[i]) return;
+			dirty[i] = 1;
+			dirtyList[count++] = i;
+		};
+		for (let i = 0; i < n; i++) {
+			if (band[i] === shown[i]) continue;
+			mark(i);
+			if (i % cols > 0) mark(i - 1);
+			if (i >= cols) mark(i - cols);
 		}
 		if (!trail) {
-			// The head lights up through the greys after a restart. A paper outline then
-			// separates it from the darkest band.
-			const age = time - spawn;
-			const slot = age < 0.2 ? 1 : age < 0.4 ? 2 : age < 0.6 ? 3 : age < 0.8 ? 4 : 5;
-			const hx = Math.round(q[0]) * PITCH, hy = Math.round(q[1]) * PITCH;
-			if (slot === 5) {
-				ctx.fillStyle = paper;
-				ctx.fillRect(hx - 2, hy - 2, 2 * PITCH + 3, 2 * PITCH + 3);
+			const next = headRange();
+			for (const [x0, y0, x1, y1] of [headBox, next]) {
+				for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) mark(y * cols + x);
 			}
-			ctx.fillStyle = ink[slot];
-			ctx.fillRect(hx, hy, 2 * PITCH - 1, 2 * PITCH - 1);
+		}
+		for (let k = 0; k < count; k++) {
+			const i = dirtyList[k];
+			const y = (i / cols) | 0, x = i - y * cols;
+			ctx.clearRect(x * PITCH, y * PITCH, PITCH, PITCH);
+			if (band[i]) {
+				ctx.fillStyle = ink[band[i]];
+				ctx.fillRect(x * PITCH, y * PITCH, SQUARE, SQUARE);
+			}
+		}
+		if (!trail) {
+			ctx.fillStyle = ink[5];
+			ctx.globalAlpha = 0.32;
+			for (let k = 0; k < count; k++) {
+				const i = dirtyList[k];
+				const y = (i / cols) | 0, x = i - y * cols;
+				if (x < cols - 1 && y < rows - 1 && isContourDot(band, cols, i, hash)) dot(i);
+			}
+			ctx.globalAlpha = 1;
+			paintHead();
+		}
+		for (let k = 0; k < count; k++) {
+			const i = dirtyList[k];
+			dirty[i] = 0;
+			shown[i] = band[i];
 		}
 	}
 
@@ -342,6 +426,7 @@ export function mountPixelField(canvas, options) {
 
 	function onTheme() {
 		readColors();
+		full = true;
 		if (!frameId) redraw();
 	}
 

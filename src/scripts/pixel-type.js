@@ -215,18 +215,20 @@ function sampleBorder(el, dpr) {
 }
 
 function lightUp() {
-	document.documentElement.classList.remove('px-wait');
+	const html = document.documentElement;
+	// px-wait stays on through the sampling pass. Layout and canvas drawing do not need the text
+	// to be visible, and the marks that fade in at the end must never see a frame without a class.
 	// The site runs its motion regardless of the Reduce Motion setting. The owner chose this on
 	// 2026-09-05 so every browser shows the same page.
 	// A hidden host, such as a deck body at rest on desktop, gets no cells. Its text would
 	// otherwise light up over an empty sheet.
 	const targets = [...document.querySelectorAll('[data-px]')].filter((t) => getComputedStyle(t).opacity !== '0');
-	if (!targets.length) return;
+	if (!targets.length) return html.classList.remove('px-wait');
 	const dpr = Math.min(2, devicePixelRatio || 1);
 	const words = rasterize(targets.flatMap(wrapWords).map(measure).filter(Boolean), dpr);
 	const borders = [...document.querySelectorAll('[data-px-border]')].map((el) => sampleBorder(el, dpr)).filter(Boolean);
 	words.push(...borders);
-	if (!words.length) return;
+	if (!words.length) return html.classList.remove('px-wait');
 	const root = getComputedStyle(document.documentElement);
 	const stages = [root.getPropertyValue('--pencil').trim(), root.getPropertyValue('--graphite').trim()];
 	for (const wd of words) {
@@ -251,8 +253,10 @@ function lightUp() {
 	document.body.appendChild(canvas);
 	for (const b of borders) document.body.appendChild(b.canvas);
 	const ctxText = canvas.getContext('2d');
-	// Pointer interaction waits until every word and border is solid.
-	document.documentElement.classList.add('px-live');
+	// Pointer interaction waits until every word and border is solid. px-live goes on before
+	// px-wait comes off, in one task, so the marks move from hidden to hidden.
+	html.classList.add('px-live');
+	html.classList.remove('px-wait');
 
 	// Words were measured in viewport coordinates at this scroll offset. A scroll during the
 	// light-up shifts the text canvas by the difference so the cells stay on their words.
@@ -320,8 +324,6 @@ function lightUp() {
 // Text waits under px-wait until the entrance starts, so no plain text flashes first. The
 // timeout is a safety net: if the entrance never runs, the text shows anyway.
 const html = document.documentElement;
-html.classList.add('px-wait');
-setTimeout(() => html.classList.remove('px-wait'), 3000);
 
 // A back or forward navigation restores a page the reader has already seen. It comes back
 // as it was, with no entrance. Otherwise the entrance waits for the load event, so every
