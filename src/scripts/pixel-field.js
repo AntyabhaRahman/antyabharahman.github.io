@@ -40,6 +40,8 @@ export function mountPixelField(canvas, options) {
 	let energy = new Float32Array(0);
 	let band = new Uint8Array(0);
 	let visit = new Float32Array(0); // last time the optimizer crossed a cell
+	let order = new Int32Array(0); // cell indices grouped by shade, rebuilt every paint
+	const counts = new Int32Array(6), starts = new Int32Array(6);
 	let hash = new Float32Array(0); // fixed per-cell value in [0, 1) that picks the contour dots
 	let time = 0, last = 0, frameId = 0;
 	let live = false; // true while some pointer energy is still worth drawing
@@ -90,6 +92,7 @@ export function mountPixelField(canvas, options) {
 			band = new Uint8Array(n);
 			visit = new Float32Array(n).fill(-1e9);
 			hash = new Float32Array(n);
+			order = new Int32Array(n);
 			let seed = 1234567;
 			for (let i = 0; i < n; i++) {
 				seed = (seed * 1103515245 + 12345) & 0x7fffffff;
@@ -247,10 +250,19 @@ export function mountPixelField(canvas, options) {
 	function paint() {
 		ctx.clearRect(0, 0, cssW, cssH);
 		const n = cols * rows;
-		for (let slot = 1; slot <= 5; slot++) {
-			ctx.fillStyle = ink[slot];
-			for (let i = 0; i < n; i++) {
-				if (band[i] !== slot) continue;
+		// A counting sort groups the lit cells by shade, so each shade walks only its own cells
+		// instead of the whole grid.
+		counts.fill(0);
+		for (let i = 0; i < n; i++) counts[band[i]]++;
+		for (let s = 1, at = 0; s <= 5; s++) {
+			starts[s] = at;
+			at += counts[s];
+		}
+		for (let i = 0; i < n; i++) if (band[i]) order[starts[band[i]]++] = i;
+		for (let s = 1, at = 0; s <= 5; s++) {
+			ctx.fillStyle = ink[s];
+			for (const end = at + counts[s]; at < end; at++) {
+				const i = order[at];
 				const y = (i / cols) | 0;
 				ctx.fillRect((i - y * cols) * PITCH, y * PITCH, SQUARE, SQUARE);
 			}

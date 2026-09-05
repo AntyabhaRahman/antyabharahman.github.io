@@ -68,14 +68,17 @@ function viewportMatrix(el) {
 	return { rect, total };
 }
 
-// One offscreen canvas serves every word. Setting its size clears it.
+// One offscreen sheet serves every word. The words are packed onto it and read back once. A
+// readback per word cost more than the whole entrance in WebKit.
 const off = document.createElement('canvas');
+const offCtx = off.getContext('2d', { willReadFrequently: true });
+const SHEET_W = 2048; // CSS px
+const SHEET_MAX = 8192; // device px, a safe canvas height everywhere
 
-// Draws one word offscreen and returns its cells plus the placement that maps offscreen
-// (u, v) to viewport (x, y).
-function sample(span, dpr) {
-	// Words far below the fold cannot scroll into view before the light-up ends. They are
-	// left as plain text, which keeps the sampling pass short on long articles.
+// Measures one word: its cell size, its box on the sheet, and the placement that maps sheet
+// (u, v) to viewport (x, y). Words far below the fold cannot scroll into view before the
+// light-up ends. They stay plain text, which keeps the pass short on long articles.
+function measure(span) {
 	if (span.getBoundingClientRect().top > innerHeight * 2) return null;
 	const cs = getComputedStyle(span);
 	const { rect, total } = viewportMatrix(span);
@@ -85,52 +88,105 @@ function sample(span, dpr) {
 	const vertical = cs.writingMode.startsWith('vertical');
 	const w = Math.ceil(vertical ? rect.height : rect.width) + cell * 2;
 	const h = Math.ceil(vertical ? rect.width : rect.height) + cell;
-	off.width = w * dpr;
-	off.height = h * dpr;
-	const o = off.getContext('2d');
-	o.scale(dpr, dpr);
-	o.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-	if ('letterSpacing' in o) o.letterSpacing = cs.letterSpacing;
-	o.textBaseline = 'alphabetic';
-	o.fillStyle = '#000';
-	const text = cs.textTransform === 'uppercase' ? span.textContent.toUpperCase() : span.textContent;
-	// The font box is centered in the inline box, so the baseline sits at the ascent plus half
-	// of any slack. This matches where the browser draws the glyphs.
-	const m = o.measureText('Hg');
-	const asc = m.fontBoundingBoxAscent || size * 0.9;
-	const desc = m.fontBoundingBoxDescent || size * 0.25;
-	const cross = vertical ? rect.width : rect.height;
-	o.fillText(text, cell, asc + (cross - asc - desc) / 2);
-
-	// Offscreen (u, v) to untransformed layout. The text starts one cell in along the inline
-	// axis, so that axis shifts back by one cell. The cross axis starts at zero. Untransformed
+	// Sheet (u, v) to untransformed layout. The text starts one cell in along the inline axis,
+	// so that axis shifts back by one cell. The cross axis starts at zero. Untransformed
 	// vertical-rl text reads top to bottom with glyph tops to the right.
 	const layout = !vertical
 		? new DOMMatrix([1, 0, 0, 1, rect.left - cell, rect.top])
 		: new DOMMatrix([0, 1, -1, 0, rect.right, rect.top - cell]);
-	const place = total.multiply(layout);
+	return {
+		span, size, cell, w, h,
+		cross: vertical ? rect.width : rect.height,
+		place: total.multiply(layout),
+		color: cs.color,
+		font: `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`,
+		letterSpacing: cs.letterSpacing,
+		text: cs.textTransform === 'uppercase' ? span.textContent.toUpperCase() : span.textContent,
+	};
+}
 
-	// Sample in offscreen space. A cell is painted when a third of its area is ink.
-	const data = o.getImageData(0, 0, w * dpr, h * dpr).data;
-	const stride = w * dpr;
-	const need = cell * cell * dpr * dpr * 255 * 0.34;
-	const cells = [];
-	let best = 0, bu = 0, bv = 0;
-	for (let v = 0; v < h; v += cell) {
-		for (let u = 0; u < w; u += cell) {
-			let sum = 0;
-			for (let dy = 0; dy < cell * dpr; dy++) {
-				let i = ((v * dpr + dy) * stride + u * dpr) * 4 + 3;
-				for (let dx = 0; dx < cell * dpr; dx++, i += 4) sum += data[i] || 0;
-			}
-			if (sum >= need) cells.push(u, v);
-			if (sum > best) (best = sum), (bu = u), (bv = v);
+// Packs the measured words onto the sheet in shelves, draws them, reads the sheet back once,
+// and samples each word's cells. A slot starts on a multiple of the word's cell, and each word
+// is clipped to its own box, so a word gets the same cells it had on a canvas of its own.
+function rasterize(items, dpr) {
+	const out = [];
+	let batch = [], x = 0, y = 0, shelf = 0, sheetW = 0;
+	const flush = () => {
+		if (!batch.length) return;
+		off.width = sheetW * dpr;
+		off.height = (y + shelf) * dpr;
+		const o = offCtx;
+		o.setTransform(dpr, 0, 0, dpr, 0, 0);
+		o.textBaseline = 'alphabetic';
+		o.fillStyle = '#000';
+		for (const it of batch) {
+			o.font = it.font;
+			// The context keeps the last word's spacing, and 'normal' is not a canvas value, so it
+			// must be written as zero.
+			if ('letterSpacing' in o) o.letterSpacing = it.letterSpacing === 'normal' ? '0px' : it.letterSpacing;
+			// The font box is centered in the inline box, so the baseline sits at the ascent plus
+			// half of any slack. This matches where the browser draws the glyphs.
+			const m = o.measureText('Hg');
+			const asc = m.fontBoundingBoxAscent || it.size * 0.9;
+			const desc = m.fontBoundingBoxDescent || it.size * 0.25;
+			o.save();
+			o.beginPath();
+			o.rect(it.x, it.y, it.w, it.h);
+			o.clip();
+			o.fillText(it.text, it.x + it.cell, it.y + asc + (it.cross - asc - desc) / 2);
+			o.restore();
 		}
+		const stride = off.width;
+		const data = o.getImageData(0, 0, off.width, off.height).data;
+		for (const it of batch) {
+			const { cell, w, h } = it;
+			// A cell is painted when a third of its area is ink.
+			const need = cell * cell * dpr * dpr * 255 * 0.34;
+			const cells = [];
+			let best = 0, bu = 0, bv = 0;
+			for (let v = 0; v < h; v += cell) {
+				for (let u = 0; u < w; u += cell) {
+					let sum = 0;
+					for (let dy = 0; dy < cell * dpr; dy++) {
+						let i = (((it.y + v) * dpr + dy) * stride + (it.x + u) * dpr) * 4 + 3;
+						for (let dx = 0; dx < cell * dpr; dx++, i += 4) sum += data[i] || 0;
+					}
+					if (sum >= need) cells.push(u, v);
+					if (sum > best) (best = sum), (bu = u), (bv = v);
+				}
+			}
+			// A thin glyph such as = or [ may fill no cell to a third. It still gets its darkest
+			// cell, so it lights up with its neighbours instead of appearing at once.
+			if (!cells.length && best > 0) cells.push(bu, bv);
+			out.push({ span: it.span, place: it.place, cells, cell, color: it.color });
+		}
+		batch = [];
+		x = y = shelf = sheetW = 0;
+	};
+	for (const it of items) {
+		// The slot covers whole cells, so a cell at the edge never reads a neighbour's ink.
+		const slotW = Math.ceil(it.w / it.cell) * it.cell, slotH = Math.ceil(it.h / it.cell) * it.cell;
+		let ax = Math.ceil(x / it.cell) * it.cell;
+		if (ax + slotW > SHEET_W && x > 0) {
+			y += shelf;
+			shelf = 0;
+			x = 0;
+			ax = 0;
+		}
+		let ay = Math.ceil(y / it.cell) * it.cell;
+		if ((ay + slotH) * dpr > SHEET_MAX && batch.length) {
+			flush();
+			ax = ay = 0;
+		}
+		it.x = ax;
+		it.y = ay;
+		x = ax + slotW;
+		shelf = Math.max(shelf, ay + slotH - y);
+		sheetW = Math.max(sheetW, x);
+		batch.push(it);
 	}
-	// A thin glyph such as = or [ may fill no cell to a third. It still gets its darkest cell,
-	// so it lights up with its neighbours instead of appearing at once.
-	if (!cells.length && best > 0) cells.push(bu, bv);
-	return { span, place, cells, cell, color: cs.color };
+	flush();
+	return out;
 }
 
 // Cells along the rough outline of a box. The outline is a pseudo element inset 2 px. Its
@@ -167,7 +223,7 @@ function lightUp() {
 	const targets = [...document.querySelectorAll('[data-px]')].filter((t) => getComputedStyle(t).opacity !== '0');
 	if (!targets.length) return;
 	const dpr = Math.min(2, devicePixelRatio || 1);
-	const words = targets.flatMap(wrapWords).map((s) => sample(s, dpr)).filter(Boolean);
+	const words = rasterize(targets.flatMap(wrapWords).map(measure).filter(Boolean), dpr);
 	const borders = [...document.querySelectorAll('[data-px-border]')].map((el) => sampleBorder(el, dpr)).filter(Boolean);
 	words.push(...borders);
 	if (!words.length) return;

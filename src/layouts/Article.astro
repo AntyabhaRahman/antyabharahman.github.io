@@ -1,6 +1,5 @@
 ---
 // Shared page for one blog post, one paper, or one project. The trail canvas sits behind the text.
-import 'katex/dist/katex.min.css';
 import Base from './Base.astro';
 import PixelCanvas from '../components/PixelCanvas.astro';
 import Note from '../components/Note.astro';
@@ -8,6 +7,7 @@ interface Props { title: string; description: string; kicker: string; backHref: 
 const { title, description, kicker, backHref, backLabel } = Astro.props;
 ---
 <Base title={`${title} · Antyabha Rahman`} description={description}>
+	<slot name="head" slot="head" />
 	<div class="pf-fixed"><PixelCanvas mode="trail" /></div>
 	<main class="article wrap" data-px>
 		<header>
