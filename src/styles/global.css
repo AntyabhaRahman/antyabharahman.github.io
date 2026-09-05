@@ -110,9 +110,8 @@ a { color: inherit; text-decoration: none; }
 	border-radius: 3px;
 	filter: url(#sketch);
 	pointer-events: none;
+	opacity: var(--pxb, 1); /* the light-up drives this from 0 to 1 */
 }
-.rough::before { transition: opacity 260ms ease; }
-.px-nb::before { opacity: 0; transition: none; }
 .px-live .deck { pointer-events: none; }
 hr.rough { border: 0; height: 2px; margin: 2.5rem 0; }
 hr.rough::before { border: 0; border-top: 1.5px solid var(--ink); inset: 0 auto auto 0; width: 100%; }

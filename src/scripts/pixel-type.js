@@ -1,8 +1,12 @@
 // Text entrance. Every element marked data-px has its words sampled into cells. One fixed
 // canvas lights the cells up in a sweep across the viewport, each cell from light grey
-// through graphite to the text color. Then each word crosses over: its cells fade out while
-// the exact glyph raster fades in on the same canvas. The real text is switched on only when
-// the raster is fully opaque, so the swap has nothing left to show.
+// through graphite to the text color. Then each word crosses over: its cells fade out on
+// the canvas while the real text fades in through its color alpha. Nothing is swapped at
+// the end, so the last frame of the crossover is the page itself.
+//
+// Rough borders (data-px-border) get one small canvas each, placed exactly over the border
+// pseudo element and given the same transform and sketch filter. The displacement noise is
+// anchored at the filtered box's origin, so the cells wobble like the border they become.
 
 const RAMP = 200; // ms for one cell to go from light grey to ink
 const SWEEP = 320; // ms for the sweep to cross the viewport
@@ -62,8 +66,8 @@ function viewportMatrix(el) {
 	return { rect, total };
 }
 
-// Draws one word on its own offscreen canvas and returns the cells plus the placement that
-// maps offscreen (u, v) to viewport (x, y). The raster is reused for the crossover.
+// Draws one word offscreen and returns its cells plus the placement that maps offscreen
+// (u, v) to viewport (x, y).
 function sample(span, dpr) {
 	const cs = getComputedStyle(span);
 	const { rect, total } = viewportMatrix(span);
@@ -81,7 +85,7 @@ function sample(span, dpr) {
 	o.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
 	if ('letterSpacing' in o) o.letterSpacing = cs.letterSpacing;
 	o.textBaseline = 'alphabetic';
-	o.fillStyle = cs.color;
+	o.fillStyle = '#000';
 	const text = cs.textTransform === 'uppercase' ? span.textContent.toUpperCase() : span.textContent;
 	// The font box is centered in the inline box, so the baseline sits at the ascent plus half
 	// of any slack. This matches where the browser draws the glyphs.
@@ -91,11 +95,12 @@ function sample(span, dpr) {
 	const cross = vertical ? rect.width : rect.height;
 	o.fillText(text, cell, asc + (cross - asc - desc) / 2);
 
-	// Offscreen (u, v) to untransformed layout. Horizontal words shift left by one cell.
-	// Untransformed vertical-rl text reads top to bottom with glyph tops to the right.
+	// Offscreen (u, v) to untransformed layout. The text starts one cell in along the inline
+	// axis, so that axis shifts back by one cell. The cross axis starts at zero. Untransformed
+	// vertical-rl text reads top to bottom with glyph tops to the right.
 	const layout = !vertical
 		? new DOMMatrix([1, 0, 0, 1, rect.left - cell, rect.top])
-		: new DOMMatrix([0, 1, -1, 0, rect.right - cell, rect.top - cell]);
+		: new DOMMatrix([0, 1, -1, 0, rect.right, rect.top - cell]);
 	const place = total.multiply(layout);
 
 	// Sample in offscreen space. A cell is painted when a third of its area is ink.
@@ -113,11 +118,12 @@ function sample(span, dpr) {
 			if (sum >= need) cells.push(u, v);
 		}
 	}
-	return { span, off, place, cells, cell, color: cs.color, w, h };
+	return { span, place, cells, cell, color: cs.color };
 }
 
-// Cells along the rough outline of a box. The outline is a pseudo element inset 2 px.
-function sampleBorder(el) {
+// Cells along the rough outline of a box. The outline is a pseudo element inset 2 px. Its
+// own canvas sits on that exact box so the sketch filter displaces both the same way.
+function sampleBorder(el, dpr) {
 	const { rect, total } = viewportMatrix(el);
 	const cell = 4, inset = 2;
 	const w = Math.round(rect.width) - 2 * inset, h = Math.round(rect.height) - 2 * inset;
@@ -125,10 +131,19 @@ function sampleBorder(el) {
 	const cells = [];
 	for (let u = 0; u < w; u += cell) cells.push(u, 0, u, h - cell);
 	for (let v = cell; v < h - cell; v += cell) cells.push(0, v, w - cell, v);
-	const place = total.multiply(new DOMMatrix([1, 0, 0, 1, rect.left + inset, rect.top + inset]));
+	const L = rect.left + inset, T = rect.top + inset;
+	const place = total.multiply(new DOMMatrix([1, 0, 0, 1, L, T]));
+	// The canvas is positioned at (L, T), so the page transform is re-expressed about its own
+	// top left corner.
+	const local = new DOMMatrix().translate(-L, -T).multiply(total).translate(L, T);
+	const canvas = document.createElement('canvas');
+	canvas.setAttribute('aria-hidden', 'true');
+	canvas.style.cssText = `position:fixed;left:${L}px;top:${T}px;width:${w}px;height:${h}px;transform-origin:0 0;transform:${local};z-index:60;pointer-events:none;filter:url(#sketch)`;
+	canvas.width = w * dpr;
+	canvas.height = h * dpr;
 	const color = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
-	el.classList.add('px-nb');
-	return { el, place, cells, cell, color, w: 0, h: 0, border: true };
+	el.style.setProperty('--pxb', '0');
+	return { el, canvas, ctx: canvas.getContext('2d'), place, cells, cell, color, border: true };
 }
 
 export function lightUp() {
@@ -137,7 +152,7 @@ export function lightUp() {
 	if (!targets.length) return;
 	const dpr = Math.min(2, devicePixelRatio || 1);
 	const words = targets.flatMap(wrapWords).map((s) => sample(s, dpr)).filter(Boolean);
-	const borders = [...document.querySelectorAll('[data-px-border]')].map(sampleBorder).filter(Boolean);
+	const borders = [...document.querySelectorAll('[data-px-border]')].map((el) => sampleBorder(el, dpr)).filter(Boolean);
 	words.push(...borders);
 	if (!words.length) return;
 	const root = getComputedStyle(document.documentElement);
@@ -153,51 +168,47 @@ export function lightUp() {
 		if (wd.span) wd.span.style.color = 'transparent';
 	}
 
-	const make = (filter) => {
-		const c = document.createElement('canvas');
-		c.setAttribute('aria-hidden', 'true');
-		c.style.cssText = `position:fixed;inset:0;width:100%;height:100%;z-index:60;pointer-events:none;filter:${filter}`;
-		c.width = innerWidth * dpr;
-		c.height = innerHeight * dpr;
-		document.body.appendChild(c);
-		return c;
-	};
-	const canvas = make('none');
-	const borderCanvas = make('url(#sketch)');
+	const canvas = document.createElement('canvas');
+	canvas.setAttribute('aria-hidden', 'true');
+	canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:60;pointer-events:none';
+	canvas.width = innerWidth * dpr;
+	canvas.height = innerHeight * dpr;
+	document.body.appendChild(canvas);
+	for (const b of borders) document.body.appendChild(b.canvas);
+	const ctxText = canvas.getContext('2d');
 	// Pointer interaction waits until every word and border is solid.
 	document.documentElement.classList.add('px-live');
-	const ctxText = canvas.getContext('2d');
-	const ctxBorder = borderCanvas.getContext('2d');
-	let ctx = ctxText;
 
 	const t0 = performance.now();
 	function frame(now) {
 		const t = now - t0;
-		for (const c of [ctxText, ctxBorder]) {
-			c.setTransform(dpr, 0, 0, dpr, 0, 0);
-			c.clearRect(0, 0, innerWidth, innerHeight);
-		}
+		ctxText.setTransform(dpr, 0, 0, dpr, 0, 0);
+		ctxText.clearRect(0, 0, innerWidth, innerHeight);
 		let done = true;
 		for (const wd of words) {
 			if (wd.finished) continue;
-			ctx = wd.border ? ctxBorder : ctxText;
-			const fade = (t - wd.ready) / FADE;
-			if (wd.border && fade > 0 && !wd.shown) {
-				// The real border fades in through CSS while the cells fade out here.
-				wd.shown = true;
-				wd.el.classList.remove('px-nb');
+			const fade = Math.min(1, (t - wd.ready) / FADE);
+			const ctx = wd.border ? wd.ctx : ctxText;
+			if (wd.border) {
+				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+			} else {
+				const { a, b, c, d, e, f } = wd.place;
+				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+				ctx.transform(a, b, c, d, e, f);
+			}
+			if (fade > 0) {
+				// The real thing fades in by the same fraction the cells fade out.
+				if (wd.span) wd.span.style.color = `color-mix(in srgb, ${wd.color} ${fade * 100}%, transparent)`;
+				else wd.el.style.setProperty('--pxb', String(fade));
 			}
 			if (fade >= 1) {
-				// The raster is fully opaque, so switching the real text on shows no change.
 				if (wd.span) wd.span.style.color = '';
+				else wd.el.style.removeProperty('--pxb');
 				wd.finished = true;
 				continue;
 			}
 			done = false;
-			// Cells and raster share one transform, so both carry the sheet's tilt.
-			const { a, b, c: pc, d, e, f } = wd.place;
-			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-			ctx.transform(a, b, pc, d, e, f);
 			ctx.globalAlpha = fade > 0 ? 1 - fade : 1;
 			const c = wd.cell;
 			for (let k = 0; k < wd.delay.length; k++) {
@@ -206,24 +217,21 @@ export function lightUp() {
 				ctx.fillStyle = p < 1 / 3 ? stages[0] : p < 2 / 3 ? stages[1] : wd.color;
 				ctx.fillRect(wd.cells[2 * k], wd.cells[2 * k + 1], c - 1, c - 1);
 			}
-			if (fade > 0 && wd.off) {
-				ctx.globalAlpha = fade;
-				ctx.drawImage(wd.off, 0, 0, wd.w, wd.h);
-			}
+			ctx.globalAlpha = 1;
 		}
-		ctxText.globalAlpha = 1;
-		ctxBorder.globalAlpha = 1;
 		if (!done && t < 6000) {
 			requestAnimationFrame(frame);
 			return;
 		}
 		canvas.remove();
-		borderCanvas.remove();
-		document.documentElement.classList.remove('px-live');
 		for (const wd of words) {
 			if (wd.span) wd.span.style.color = '';
-			if (wd.el) wd.el.classList.remove('px-nb');
+			if (wd.el) {
+				wd.el.style.removeProperty('--pxb');
+				wd.canvas.remove();
+			}
 		}
+		document.documentElement.classList.remove('px-live');
 	}
 	requestAnimationFrame(frame);
 }
