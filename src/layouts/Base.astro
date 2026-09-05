@@ -1,0 +1,58 @@
+---
+import '../styles/global.css';
+import ThemeToggle from '../components/ThemeToggle.astro';
+interface Props { title: string; description?: string; }
+const { title, description = 'Projects, blog posts, and research by Antyabha Rahman.' } = Astro.props;
+const path = Astro.url.pathname;
+const nav = [
+	['/projects/', 'Projects'],
+	['/blog/', 'Blog'],
+	['/research/', 'Research'],
+];
+---
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+		<script is:inline>
+			// Runs before paint so the page never flashes the wrong theme.
+			(function () {
+				var saved = localStorage.getItem('theme');
+				var dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+				document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+			})();
+		</script>
+	</head>
+	<body>
+		<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+			<filter id="sketch" x="-4%" y="-4%" width="108%" height="108%">
+				<feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="n" />
+				<feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G" />
+			</filter>
+		</svg>
+		<header class="site-header wrap">
+			<div class="ident"><a class="wordmark" href="/" data-px>Antyabha Rahman</a><span class="role" data-px>Engineer and researcher</span></div>
+			<nav class="nav" aria-label="Site">
+				{nav.map(([href, label]) => (
+					<a class="u" href={href} aria-current={path.startsWith(href) ? 'page' : undefined} data-px>{label}</a>
+				))}
+				<ThemeToggle />
+			</nav>
+		</header>
+		<slot />
+		<script>
+			import '../scripts/pixel-type.js';
+		</script>
+		<footer class="site-footer wrap">
+			<span>© {new Date().getFullYear()} Antyabha Rahman</span>
+			<a class="u" href="https://github.com/AntyabhaRahman">github.com/AntyabhaRahman</a>
+		</footer>
+	</body>
+</html>

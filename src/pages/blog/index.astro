@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+<Base title="Blog · Antyabha Rahman" description="Technical notes with the maths left in.">
+	<main class="wrap">
+		<h1 class="page-title display" data-px>Blog</h1>
+		<p class="page-lede" data-px>Working notes on machine learning and maths. Select a passage while you read and watch the margin.</p>
+		<ol class="list">
+			{posts.map((p) => (
+				<li class="card rough" data-px data-px-border>
+					<h2><a class="u" href={`/blog/${p.id}/`}>{p.data.title}</a></h2>
+					<p class="muted" style="margin:0">{p.data.description}</p>
+					<div class="meta">
+						<span class="hand">{fmt(p.data.date)}</span>
+						{p.data.tags.map((t) => <span class="tag">{t}</span>)}
+					</div>
+				</li>
+			))}
+		</ol>
+	</main>
+</Base>

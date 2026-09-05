@@ -1,0 +1,109 @@
+---
+// Three tall paper panels. A hover or focus widens one panel and reveals its newest items. skiper35 style.
+import Note from './Note.astro';
+interface Item { href: string; title: string; date: Date; }
+interface Panel { href: string; title: string; blurb: string; items: Item[]; count: number; }
+// Ink drawings, one per sheet: a box with a face, a page with a pencil, a flask. Each has a hatch layer for shading.
+const drawings = [
+	{ line: 'M8 10 h32 v30 h-32 z M14 22 l3 3 M31 22 l3 3 M17 33 c6 4 10 4 16 0 M4 44 h40',
+	  hatch: 'M9 40 l4 -4 M9 36 l7 -7 M9 32 l5 -5 M36 40 l4 -4 M33 40 l7 -7' },
+	{ line: 'M10 6 h22 l8 8 v30 h-30 z M32 6 v8 h8 M16 23 h17 M16 29 h9 M16 36 h7 M29 30 l12 11 -3 3 -12 -11 z M29 30 l-3 3',
+	  hatch: 'M11 42 l5 -5 M11 38 l4 -4 M33 8 l6 6 M35 7 l4 4' },
+	{ line: 'M20 4 h10 M22 4 v12 l-12 24 c-2 4 1 6 4 6 h22 c3 0 6 -2 4 -6 l-12 -24 v-12 M14 34 c6 -4 8 2 12 -2 c3 -3 6 4 10 0',
+	  hatch: 'M14 39 l4 -4 M17 42 l6 -7 M22 43 l7 -8 M28 43 l6 -7 M33 43 l3 -4 M16 37 l7 6 M22 36 l8 7 M29 36 l7 6' },
+];
+interface Props { panels: Panel[]; }
+const { panels } = Astro.props;
+const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+---
+<div class="deck">
+	{panels.map((p, i) => (
+		<article class="panel rough" data-px-border style={`--tilt:${[-0.7, 0.45, -0.35][i]}deg; --i:${i}`}>
+			<div class="panel-side">
+				<svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true">
+					<path class="hatch" d={drawings[i].hatch} />
+					<path d={drawings[i].line} />
+				</svg>
+				<h2 class="panel-title display" data-px><a href={p.href}>{p.title}</a></h2>
+			</div>
+			<div class="panel-body">
+				<dl class="panel-spec hand">
+					<div><dt>Section</dt><dd>{String(i + 1).padStart(2, '0')}</dd></div>
+					<div><dt>Entries</dt><dd>{String(p.count).padStart(2, '0')}</dd></div>
+					<div><dt>Updated</dt><dd>{p.items[0] ? fmt(p.items[0].date) : 'none'}</dd></div>
+				</dl>
+				<div class="panel-stack">
+				<p class="panel-blurb">{p.blurb}</p>
+				<ol class="panel-items">
+					{p.items.map((it, j) => (
+						<li>
+							<a class="u u--bare" href={it.href}>{it.title}</a>
+							<span class="hand">{fmt(it.date)}</span>
+							{j === 0 && <Note dir="left">newest</Note>}
+						</li>
+					))}
+				</ol>
+				<a class="panel-all u" href={p.href}>All {p.title.toLowerCase()}</a>
+				</div>
+			</div>
+		</article>
+	))}
+</div>
+
+<style>
+	.deck {
+		display: flex; gap: 1.25rem; align-items: stretch;
+		height: min(72dvh, 44rem); min-height: 30rem;
+		position: relative; z-index: 1;
+	}
+	.panel {
+		flex: 1 1 0; min-width: 5.5rem;
+		background: color-mix(in srgb, var(--paper) 78%, transparent); box-shadow: var(--shadow);
+		display: grid; grid-template-columns: auto 1fr; overflow: hidden;
+		transform: rotate(var(--tilt));
+		transition: flex 620ms cubic-bezier(0.32, 0.72, 0, 1), transform 620ms cubic-bezier(0.32, 0.72, 0, 1), background-color 400ms ease;
+	}
+	.deck:has(.panel:hover) .panel, .deck:has(.panel:focus-within) .panel { transform: rotate(0deg); }
+	.panel:hover, .panel:focus-within { flex-grow: 3.2; transform: rotate(0deg) translateY(-4px); background: color-mix(in srgb, var(--paper) 96%, transparent); }
+	.deck:has(.panel:focus-within) .panel:hover:not(:focus-within) { flex-grow: 1; }
+	.panel-side { display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 1.3rem 0.9rem; }
+	.panel-draw { width: 3rem; height: 3rem; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; filter: url(#sketch); transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1); }
+	.panel-draw .hatch { stroke: var(--graphite); stroke-width: 0.7; opacity: 0.7; }
+	.panel:hover .panel-draw, .panel:focus-within .panel-draw { transform: rotate(-3deg); }
+	.panel-title {
+		margin: 0; font-size: clamp(2rem, 4vw, 3.2rem);
+		writing-mode: vertical-rl; transform: rotate(180deg); line-height: 1;
+	}
+	.panel-title a { display: block; }
+	.panel-body {
+		padding: 2rem 2rem 2rem 0.75rem; min-width: 18rem;
+		display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;
+		opacity: 0; transform: translateX(14px);
+		transition: opacity 360ms ease, transform 620ms cubic-bezier(0.32, 0.72, 0, 1);
+	}
+	.panel:hover .panel-body, .panel:focus-within .panel-body { opacity: 1; transform: none; transition-delay: 160ms; }
+	.panel-stack { display: flex; flex-direction: column; gap: 1rem; }
+	.panel-spec { margin: 0; display: grid; grid-template-columns: repeat(3, max-content); gap: 0 2.2rem; }
+	.panel-spec dt { color: var(--graphite); }
+	.panel-spec dd { margin: 0.2rem 0 0; color: var(--ink); }
+	.panel-blurb { color: var(--graphite); margin: 0; max-width: 34ch; }
+	.panel-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+	.panel-items li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 0.8rem; line-height: 1.35; }
+	.panel-items .hand { font-size: 0.7rem; }
+	.panel-all { align-self: flex-start; font-size: 0.95rem; }
+
+	@media (prefers-reduced-motion: reduce) {
+		.panel, .panel-body { transition-duration: 1ms; }
+	}
+	@media (hover: none) {
+		.panel-body { opacity: 1; transform: none; }
+	}
+	@media (max-width: 760px) {
+		.deck { flex-direction: column; height: auto; min-height: 0; }
+		.panel { flex: none; transform: none; grid-template-columns: 1fr; }
+		.panel:hover, .panel:focus-within { flex: none; transform: none; }
+		.panel-side { flex-direction: row-reverse; justify-content: space-between; padding: 1.2rem 1.2rem 0; }
+		.panel-title { writing-mode: horizontal-tb; transform: none; font-size: 2rem; }
+		.panel-body { opacity: 1; transform: none; padding: 1rem 1.2rem 1.4rem; min-width: 0; }
+	}
+</style>

@@ -1,0 +1,55 @@
+---
+// Sun and moon drawn as loose ink strokes. The swap uses the View Transition API when the browser has it.
+---
+<button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+	<svg viewBox="0 0 24 24" aria-hidden="true">
+		<g class="sun">
+			<path d="M12 7.4 C18.1 7.1 18.4 16.5 12.2 16.7 C6 17 5.9 7.8 12 7.4Z" />
+			<path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" />
+		</g>
+		<path class="moon" d="M14.6 3.2 C5.8 1.8 1 12.4 6.8 18.4 C10.8 22.6 18 21.5 20.8 15.9 C12.5 18.1 9.2 8.6 14.6 3.2Z" />
+	</svg>
+</button>
+
+<style>
+	.theme-toggle {
+		width: 2.2rem; height: 2.2rem; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer;
+		display: grid; place-items: center; border-radius: 50%;
+	}
+	.theme-toggle svg { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.78; stroke-linecap: round; stroke-linejoin: round; filter: url(#sketch); }
+	.sun { transform-origin: 12px 12px; transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 250ms; }
+	.moon { transition: opacity 250ms; }
+	:global([data-theme='dark']) .sun { opacity: 0; transform: rotate(90deg) scale(0.6); }
+	:global([data-theme='light']) .moon { opacity: 0; }
+</style>
+
+<script>
+	const btn = document.querySelector<HTMLButtonElement>('.theme-toggle')!;
+	const root = document.documentElement;
+
+	function sync() {
+		const dark = root.dataset.theme === 'dark';
+		btn.setAttribute('aria-pressed', String(dark));
+		btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+	}
+
+	function apply() {
+		root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+		localStorage.setItem('theme', root.dataset.theme);
+		sync();
+		document.dispatchEvent(new CustomEvent('themechange'));
+	}
+
+	btn.addEventListener('click', () => {
+		const r = btn.getBoundingClientRect();
+		root.style.setProperty('--vt-x', `${r.left + r.width / 2}px`);
+		root.style.setProperty('--vt-y', `${r.top + r.height / 2}px`);
+		const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (!reduce && 'startViewTransition' in document) {
+			(document as any).startViewTransition(apply);
+		} else {
+			apply();
+		}
+	});
+	sync();
+</script>

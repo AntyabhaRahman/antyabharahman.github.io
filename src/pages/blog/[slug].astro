@@ -1,0 +1,16 @@
+---
+import { getCollection, render } from 'astro:content';
+import Article from '../../layouts/Article.astro';
+export async function getStaticPaths() {
+	return (await getCollection('blog')).map((p) => ({ params: { slug: p.id }, props: { post: p } }));
+}
+const { post } = Astro.props;
+const { Content } = await render(post);
+const fmt = post.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Article title={post.data.title} description={post.data.description} kicker={fmt} backHref="/blog/" backLabel="all posts">
+	<div class="meta" slot="meta">
+		{post.data.tags.map((t) => <span class="tag">{t}</span>)}
+	</div>
+	<Content />
+</Article>

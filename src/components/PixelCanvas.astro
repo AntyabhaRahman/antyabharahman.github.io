@@ -1,0 +1,12 @@
+---
+interface Props { mode: 'ambient' | 'trail'; class?: string; }
+const { mode, class: cls = '' } = Astro.props;
+---
+<canvas class={`pf ${cls}`} data-mode={mode} aria-hidden="true"></canvas>
+
+<script>
+	import { mountPixelField } from '../scripts/pixel-field.js';
+	document.querySelectorAll<HTMLCanvasElement>('canvas.pf').forEach((c) => {
+		mountPixelField(c, { mode: c.dataset.mode as 'ambient' | 'trail' });
+	});
+</script>

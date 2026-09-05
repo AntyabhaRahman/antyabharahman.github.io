@@ -1,0 +1,20 @@
+---
+import { getCollection, render } from 'astro:content';
+import Article from '../../layouts/Article.astro';
+export async function getStaticPaths() {
+	return (await getCollection('projects')).map((p) => ({ params: { slug: p.id }, props: { project: p } }));
+}
+const { project } = Astro.props;
+const { Content } = await render(project);
+const d = project.data;
+---
+<Article title={d.title} description={d.description} kicker={d.status === 'active' ? 'in progress' : `finished ${d.date.getFullYear()}`} backHref="/projects/" backLabel="all projects">
+	<div slot="meta">
+		<div class="meta">{d.tags.map((t) => <span class="tag">{t}</span>)}</div>
+		<div class="links">
+			{d.repo && <a class="u" href={d.repo}>Repository</a>}
+			{d.url && <a class="u" href={d.url}>Live site</a>}
+		</div>
+	</div>
+	<Content />
+</Article>
