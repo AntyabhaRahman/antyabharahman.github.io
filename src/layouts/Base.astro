@@ -26,6 +26,9 @@ const nav = [
 		{/* Runs before paint: sets the theme so the page never flashes the wrong one, and hides the text
 		    under px-wait so the entrance draws first. The module removes px-wait; a 3 s timer is the
 		    safety net if it fails. Kept on one line: inline scripts ship as written. */}
+		{/* The same two rules as in global.css. Inline, they hold before the stylesheet arrives,
+		    so WebKit never paints the marks for one frame. */}
+		<style is:inline>.px-wait [data-px],.px-wait [data-px-border]{visibility:hidden}.px-wait .nav a[aria-current='page']::before,.px-wait .panel-draw,.px-wait .theme-toggle svg,.px-wait .note svg{opacity:0}</style>
 		<script is:inline>(function(h){var s=localStorage.getItem('theme');h.dataset.theme=(s?s==='dark':matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';h.classList.add('px-wait');setTimeout(function(){h.classList.remove('px-wait')},3000)})(document.documentElement)</script>
 	</head>
 	<body>

@@ -261,6 +261,12 @@ function lightUp() {
 	// Words were measured in viewport coordinates at this scroll offset. A scroll during the
 	// light-up shifts the text canvas by the difference so the cells stay on their words.
 	const sx0 = scrollX, sy0 = scrollY;
+	// A resize moves every word, but the cells were sampled once. The entrance ends at the
+	// next frame and the text shows in place.
+	const w0 = innerWidth, h0 = innerHeight;
+	let resized = false;
+	const onResize = () => { if (innerWidth !== w0 || innerHeight !== h0) resized = true; };
+	addEventListener('resize', onResize);
 	const t0 = performance.now();
 	function frame(now) {
 		const t = now - t0;
@@ -304,10 +310,11 @@ function lightUp() {
 			}
 			ctx.globalAlpha = 1;
 		}
-		if (!done && t < 6000) {
+		if (!done && t < 6000 && !resized) {
 			requestAnimationFrame(frame);
 			return;
 		}
+		removeEventListener('resize', onResize);
 		canvas.remove();
 		for (const wd of words) {
 			if (wd.span) wd.span.style.color = '';

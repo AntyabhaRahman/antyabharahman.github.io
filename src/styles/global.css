@@ -220,4 +220,5 @@ canvas.pf { display: block; pointer-events: none; opacity: var(--pf-opacity, 0.8
 	.card h2 a { display: inline-block; padding-block: 0.6rem; margin-block: -0.6rem; }
 	.note a { padding-block: 0.9rem; margin-block: -0.9rem; }
 	.nav a { padding-block: 0.7rem; margin-block: -0.7rem; }
+	.wordmark { display: inline-block; padding-block: 0.9rem; margin-block: -0.9rem; }
 }

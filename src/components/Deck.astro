@@ -52,8 +52,14 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 <script>
 	// The deck is a size container, so a sheet can be capped at the deck height. Chromium
 	// resolves cqh to 0 for a flex-grown container, so the height is copied into a variable.
+	// The first write is synchronous: the observer's first call can land after the entrance
+	// has sampled the sheets, and a sheet without a height collapses.
 	const deck = document.querySelector('.deck');
-	if (deck) new ResizeObserver(([e]) => deck.style.setProperty('--deck-h', `${e.contentRect.height}px`)).observe(deck);
+	if (deck) {
+		const set = (h) => deck.style.setProperty('--deck-h', `${h}px`);
+		set(deck.getBoundingClientRect().height);
+		new ResizeObserver(([e]) => set(e.contentRect.height)).observe(deck);
+	}
 </script>
 <style>
 	.deck {
@@ -75,8 +81,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.deck:has(.panel:hover) .panel, .deck:has(.panel:focus-within) .panel { transform: rotate(0deg); }
 	.panel:hover, .panel:focus-within { flex-grow: 3.2; transform: rotate(0deg) translateY(-4px); background: color-mix(in srgb, var(--paper) 96%, transparent); }
 	.deck:has(.panel:focus-within) .panel:hover:not(:focus-within) { flex-grow: 1; }
-	.panel-side { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1.3rem 0.9rem; }
-	.panel-draw { width: 3rem; height: 3rem; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1); }
+	.panel-side { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1.45rem 0.9rem; }
+	.panel-draw { width: 3rem; height: 3rem; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1), opacity 320ms ease; }
 	.panel-draw .hatch { stroke: var(--graphite); stroke-width: 0.7; opacity: 0.7; }
 	.panel:hover .panel-draw, .panel:focus-within .panel-draw { transform: rotate(-3deg); }
 	.panel-title {
@@ -112,6 +118,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 		.panel-side { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 1.2rem 1.2rem 0; }
 		.panel-draw { grid-column: 2; grid-row: 1; }
 		.panel-title { grid-column: 1; grid-row: 1; margin: 0; writing-mode: horizontal-tb; transform: none; font-size: clamp(1.55rem, 8vw, 2rem); min-width: 0; }
+		.panel-title a { padding-block: 0.5rem; margin-block: -0.5rem; }
 		.panel-spec { grid-column: 1 / -1; grid-row: 2; flex: none; overflow: visible; writing-mode: horizontal-tb; transform: none; justify-content: flex-start; flex-wrap: wrap; }
 		.panel-spec > div { gap: 0.25rem; }
 		.panel-body { opacity: 1; transform: none; padding: 1rem 1.2rem 1.4rem; min-width: 0; }
