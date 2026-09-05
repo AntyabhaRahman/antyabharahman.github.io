@@ -1,16 +1,14 @@
 ---
 // A margin note: hand lettering with a small drawn arrow.
-interface Props { dir?: 'left' | 'right' | 'down'; class?: string; }
+interface Props { dir?: 'left' | 'right'; class?: string; }
 const { dir = 'left', class: cls = '' } = Astro.props;
 const arrows = {
 	left: 'M22 6 Q14 3 3 8 M7 3 L3 8 L9 10',
 	right: 'M2 9 Q11 12 21 5 M15 4 L21 5 L18 11',
-	down: 'M9 1 Q5 7 10 12 M5 9 L10 12 L12 7',
 };
 ---
 <span class={`note ${cls}`}>
 	{dir === 'left' && <svg viewBox="0 0 24 14" aria-hidden="true"><path d={arrows.left} /></svg>}
 	<span><slot /></span>
 	{dir === 'right' && <svg viewBox="0 0 24 14" aria-hidden="true"><path d={arrows.right} /></svg>}
-	{dir === 'down' && <svg class="down" viewBox="0 0 16 14" aria-hidden="true"><path d={arrows.down} /></svg>}
 </span>

@@ -8,7 +8,7 @@
 	--pencil: #b8b5ac;
 	--accent: #1a1a1a;
 	--accent-ink: #1a1a1a;
-	--shadow: 0 1px 0 rgba(26, 26, 26, 0.35), 3px 4px 0 rgba(26, 26, 26, 0.08);
+	--shadow: 3px 4px 0 rgba(26, 26, 26, 0.08);
 	--grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 	--pf-bands: #c3c0b7, #9e9b92, #77756f, #504f49;
 	--pf-accent: #1a1a1a;
@@ -27,7 +27,7 @@
 	--pencil: #3a3f45;
 	--accent: #e8e6df;
 	--accent-ink: #e8e6df;
-	--shadow: 0 1px 0 rgba(232, 230, 223, 0.35), 3px 4px 0 rgba(0, 0, 0, 0.25);
+	--shadow: 3px 4px 0 rgba(0, 0, 0, 0.25);
 	--grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.91 0 0 0 0 0.9 0 0 0 0 0.875 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 	--pf-bands: #33393f, #464d55, #616870, #8b9098;
 	--pf-accent: #e8e6df;
@@ -155,10 +155,9 @@ a { color: inherit; text-decoration: none; }
 .site-footer { margin-top: auto; padding: 2rem 0 1.4rem; color: var(--graphite); font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; justify-content: space-between; }
 
 /* Margin note: hand lettering with a small drawn arrow. */
-.note { font-family: var(--font-label); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--graphite); display: inline-flex; align-items: center; gap: 0.5em; line-height: 1.1; white-space: nowrap; }
-.note svg { width: 1.6em; height: 1em; overflow: visible; }
+.note { font-family: var(--font-label); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--graphite); display: inline-flex; align-items: flex-start; gap: 0.5em; line-height: 1.1; white-space: nowrap; }
+.note svg { width: 1.6em; height: 1em; margin-top: 0.05em; overflow: visible; }
 .note svg path { fill: none; stroke: currentColor; stroke-width: 1.2px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
-.note svg.down { width: 1em; }
 
 /* Index lists and cards */
 .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; }
