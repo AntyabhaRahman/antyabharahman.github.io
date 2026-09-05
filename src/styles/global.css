@@ -148,7 +148,7 @@ hr.rough::before { border: 0; border-top: 1.5px solid var(--ink); inset: 0 auto 
 .page-lede { color: var(--graphite); max-width: var(--measure); margin-bottom: 2.5rem; }
 
 /* Article */
-.article { position: relative; z-index: 1; padding-bottom: 3rem; }
+.article { position: relative; z-index: 1; padding-bottom: 3rem; max-width: var(--measure); }
 .article header { margin: 2.5rem 0 2.5rem; max-width: var(--measure); }
 .article h1 { font-size: clamp(2rem, 3.8vw, 3.2rem); line-height: 1; }
 .article .meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-items: baseline; color: var(--graphite); font-size: 0.9rem; margin-top: 0.6rem; }

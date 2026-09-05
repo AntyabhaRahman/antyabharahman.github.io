@@ -9,11 +9,11 @@ const { title, description, kicker, backHref, backLabel } = Astro.props;
 ---
 <Base title={`${title} · Antyabha Rahman`} description={description}>
 	<div class="pf-fixed"><PixelCanvas mode="trail" /></div>
-	<main class="article wrap">
+	<main class="article wrap" data-px>
 		<header>
 			<Note dir="left"><a class="u u--bare" href={backHref}>{backLabel}</a></Note>
 			<p class="hand" style="margin:0.8rem 0 0.2rem">{kicker}</p>
-			<h1 class="display" data-px>{title}</h1>
+			<h1 class="display">{title}</h1>
 			<slot name="meta" />
 		</header>
 		<div class="prose">

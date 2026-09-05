@@ -17,7 +17,9 @@ function wrapWords(el) {
 	const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
 	const nodes = [];
 	for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-		if (n.textContent.trim() && !n.parentElement.closest('svg, canvas, .px-w')) nodes.push(n);
+		// KaTeX keeps a hidden MathML copy of each formula for screen readers. Its glyphs are
+		// never painted, so they get no cells.
+		if (n.textContent.trim() && !n.parentElement.closest('svg, canvas, .px-w, .katex-mathml')) nodes.push(n);
 	}
 	const words = [];
 	for (const n of nodes) {
@@ -66,9 +68,15 @@ function viewportMatrix(el) {
 	return { rect, total };
 }
 
+// One offscreen canvas serves every word. Setting its size clears it.
+const off = document.createElement('canvas');
+
 // Draws one word offscreen and returns its cells plus the placement that maps offscreen
 // (u, v) to viewport (x, y).
 function sample(span, dpr) {
+	// Words far below the fold cannot scroll into view before the light-up ends. They are
+	// left as plain text, which keeps the sampling pass short on long articles.
+	if (span.getBoundingClientRect().top > innerHeight * 2) return null;
 	const cs = getComputedStyle(span);
 	const { rect, total } = viewportMatrix(span);
 	if (rect.width < 2 || rect.height < 2) return null;
@@ -77,7 +85,6 @@ function sample(span, dpr) {
 	const vertical = cs.writingMode.startsWith('vertical');
 	const w = Math.ceil(vertical ? rect.height : rect.width) + cell * 2;
 	const h = Math.ceil(vertical ? rect.width : rect.height) + cell;
-	const off = document.createElement('canvas');
 	off.width = w * dpr;
 	off.height = h * dpr;
 	const o = off.getContext('2d');
@@ -108,6 +115,7 @@ function sample(span, dpr) {
 	const stride = w * dpr;
 	const need = cell * cell * dpr * dpr * 255 * 0.34;
 	const cells = [];
+	let best = 0, bu = 0, bv = 0;
 	for (let v = 0; v < h; v += cell) {
 		for (let u = 0; u < w; u += cell) {
 			let sum = 0;
@@ -116,8 +124,12 @@ function sample(span, dpr) {
 				for (let dx = 0; dx < cell * dpr; dx++, i += 4) sum += data[i] || 0;
 			}
 			if (sum >= need) cells.push(u, v);
+			if (sum > best) (best = sum), (bu = u), (bv = v);
 		}
 	}
+	// A thin glyph such as = or [ may fill no cell to a third. It still gets its darkest cell,
+	// so it lights up with its neighbours instead of appearing at once.
+	if (!cells.length && best > 0) cells.push(bu, bv);
 	return { span, place, cells, cell, color: cs.color };
 }
 
