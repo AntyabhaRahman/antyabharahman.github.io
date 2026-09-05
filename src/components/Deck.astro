@@ -18,13 +18,13 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 ---
 <div class="deck">
 	{panels.map((p, i) => (
-		<article class="panel rough" data-px-border style={`--tilt:${[-0.7, 0.45, -0.35][i]}deg`}>
+		<article class="panel rough" data-px-border style={`--tilt:${[-0.7, 0.45, -0.35][i]}deg; --n:${p.count}`}>
 			<div class="panel-side">
 				<svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true">
 					<path class="hatch" d={drawings[i].hatch} />
 					<path d={drawings[i].line} />
 				</svg>
-				<dl class="panel-spec hand">
+				<dl class="panel-spec hand" data-px>
 					<div><dt>Entries</dt><dd>{String(p.count).padStart(2, '0')}</dd></div>
 					<div><dt class="sr">Updated</dt><dd>{p.items[0] ? fmt(p.items[0].date) : 'none'}</dd></div>
 				</dl>
@@ -51,10 +51,13 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 
 <style>
 	.deck {
-		display: flex; gap: 1.25rem; align-items: stretch;
+		display: flex; gap: 1.25rem; align-items: flex-start;
 		flex: 1 1 auto; height: auto; min-height: 20rem;
 		position: relative; z-index: 1;
 	}
+	/* A sheet is as long as its section: a base for the spine plus 4rem per entry. The hero
+	   caps it, and the field runs on below the shorter sheets. */
+	.panel { height: min(100%, calc(28rem + var(--n, 0) * 4rem)); }
 	.panel {
 		flex: 1 1 0; min-width: 5.5rem;
 		background: color-mix(in srgb, var(--paper) 78%, transparent); box-shadow: var(--shadow);
@@ -102,7 +105,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	}
 	@media (hover: none), (max-width: 760px) {
 		.deck { flex-direction: column; flex: none; height: auto; min-height: 0; }
-		.panel { flex: none; transform: none; grid-template-columns: 1fr; }
+		.panel { flex: none; height: auto; transform: none; grid-template-columns: 1fr; }
 		.panel { background: var(--paper); }
 		.panel:hover, .panel:focus-within { flex: none; transform: none; }
 		.panel-side { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 1.2rem 1.2rem 0; }

@@ -1,6 +1,6 @@
 // Reactive pixel field on a 2D canvas.
 // One grid, two modes. 'ambient' draws a loss landscape as contour rings with an
-// optimizer that descends it. 'trail' draws only the pointer trail and selections.
+// optimizer that descends it. 'trail' draws only the pointer trail.
 
 const PITCH = 9; // cell pitch in CSS px: an 8 px square plus a 1 px gap
 const SQUARE = 8;
@@ -46,7 +46,7 @@ export function mountPixelField(canvas, options) {
 	let hash = new Float32Array(0); // fixed per-cell value in [0, 1) for trail fade
 	let time = 0, last = 0, frameId = 0;
 	let live = false; // true while some pointer energy is still worth drawing
-	let onScreen = true, selectionDirty = false;
+	let onScreen = true;
 	let prevX = 0, prevY = 0, hasPrev = false;
 
 	// Optimizer state, in cell coordinates.
@@ -167,37 +167,6 @@ export function mountPixelField(canvas, options) {
 		prevY = cy;
 		hasPrev = true;
 		start();
-	}
-
-	// A selection lights the margins beside the selected lines, not the cells under the text.
-	// The browser highlight already marks the text itself, and ink over cells is hard to read.
-	const MARGIN_CELLS = 8;
-	function applySelection() {
-		const sel = document.getSelection();
-		if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
-		const box = canvas.getBoundingClientRect();
-		const column = (document.querySelector('.prose') || document.body).getBoundingClientRect();
-		const leftEdge = Math.floor((column.left - box.left) / PITCH) - 1;
-		const rightEdge = Math.ceil((column.right - box.left) / PITCH) + 1;
-		const spans = [
-			[Math.max(0, leftEdge - MARGIN_CELLS), Math.min(cols - 1, leftEdge)],
-			[Math.max(0, rightEdge), Math.min(cols - 1, rightEdge + MARGIN_CELLS)],
-		];
-		const rects = sel.getRangeAt(0).getClientRects();
-		for (let r = 0; r < rects.length; r++) {
-			const b = rects[r];
-			const y0 = Math.max(0, Math.floor((b.top - box.top) / PITCH));
-			const y1 = Math.min(rows - 1, Math.ceil((b.bottom - box.top) / PITCH));
-			for (let y = y0; y <= y1; y++) {
-				const row = y * cols;
-				for (const [x0, x1] of spans) {
-					for (let x = x0; x <= x1; x++) {
-						if (energy[row + x] < 0.9) energy[row + x] = 0.9;
-					}
-				}
-			}
-		}
-		live = true;
 	}
 
 	function heat(x, y) {
@@ -375,11 +344,6 @@ export function mountPixelField(canvas, options) {
 		const dt = Math.min(0.05, (now - last) / 1000);
 		last = now;
 		time += dt;
-		// A held selection is re-applied every frame, so it stays lit while the rest decays.
-		if (selectionDirty || (trail && !document.getSelection()?.isCollapsed)) {
-			selectionDirty = false;
-			applySelection();
-		}
 		decay(dt);
 		if (!trail) advance(dt);
 		compose();
@@ -389,7 +353,7 @@ export function mountPixelField(canvas, options) {
 
 	function start() {
 		if (frameId || motion.matches || document.hidden || !onScreen || cols === 0) return;
-		if (trail && !live && !selectionDirty) return;
+		if (trail && !live) return;
 		last = performance.now();
 		frameId = requestAnimationFrame(frame);
 	}
@@ -416,12 +380,6 @@ export function mountPixelField(canvas, options) {
 		start();
 	}
 
-	function onSelectionChange() {
-		if (!trail || motion.matches) return;
-		selectionDirty = true;
-		start();
-	}
-
 	readColors();
 	const sizeWatch = new ResizeObserver(resize);
 	sizeWatch.observe(parent);
@@ -435,7 +393,6 @@ export function mountPixelField(canvas, options) {
 	window.addEventListener('resize', resize);
 	document.addEventListener('visibilitychange', onVisibility);
 	document.addEventListener('themechange', onTheme);
-	document.addEventListener('selectionchange', onSelectionChange);
 	motion.addEventListener('change', onMotion);
 	resize();
 	start();
@@ -449,7 +406,6 @@ export function mountPixelField(canvas, options) {
 			window.removeEventListener('resize', resize);
 			document.removeEventListener('visibilitychange', onVisibility);
 			document.removeEventListener('themechange', onTheme);
-			document.removeEventListener('selectionchange', onSelectionChange);
 			motion.removeEventListener('change', onMotion);
 		},
 	};
