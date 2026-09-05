@@ -49,15 +49,22 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	))}
 </div>
 
+<script>
+	// The deck is a size container, so a sheet can be capped at the deck height. Chromium
+	// resolves cqh to 0 for a flex-grown container, so the height is copied into a variable.
+	const deck = document.querySelector('.deck');
+	if (deck) new ResizeObserver(([e]) => deck.style.setProperty('--deck-h', `${e.contentRect.height}px`)).observe(deck);
+</script>
 <style>
 	.deck {
 		display: flex; gap: 1.25rem; align-items: flex-start;
 		flex: 1 1 auto; height: auto; min-height: 20rem;
 		position: relative; z-index: 1;
+		container-type: size;
 	}
 	/* A sheet is as long as its section: a base for the spine plus 4rem per entry. The hero
 	   caps it, and the field runs on below the shorter sheets. */
-	.panel { height: min(100%, calc(28rem + var(--n, 0) * 4rem)); }
+	.panel { height: min(var(--deck-h, 100cqh), calc(28rem + var(--n, 0) * 4rem)); }
 	.panel {
 		flex: 1 1 0; min-width: 5.5rem;
 		background: color-mix(in srgb, var(--paper) 78%, transparent); box-shadow: var(--shadow);
@@ -85,12 +92,12 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	}
 	.panel:hover .panel-body, .panel:focus-within .panel-body { opacity: 1; transform: none; transition-delay: 160ms; }
 	.panel-stack { display: flex; flex-direction: column; gap: 1rem; }
-	.panel-spec { margin: 0; display: flex; justify-content: flex-end; gap: 1.15rem; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+	.panel-spec { margin: 0; display: flex; justify-content: flex-end; gap: 1.15rem; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; flex: 0 1 auto; min-height: 0; overflow: hidden; }
 	.panel-title { flex-shrink: 0; }
 	.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-	@media (max-height: 820px) and (min-width: 761px) { .panel-title { font-size: 2.4rem; } }
+	@media (max-height: 820px) and (min-width: 901px) { .panel-title { font-size: 2.4rem; } }
 	/* A short window has no room on the spine for the spec. */
-	@media (max-height: 740px) and (min-width: 761px) { .panel-spec { display: none; } }
+	@media (max-height: 740px) and (min-width: 901px) { .panel-spec { display: none; } }
 	.panel-spec > div { display: flex; gap: 0.35rem; }
 	.panel-spec dt { color: var(--graphite); }
 	.panel-spec dd { margin: 0; color: var(--ink); }
@@ -103,8 +110,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	@media (hover: none) {
 		.panel-body { opacity: 1; transform: none; }
 	}
-	@media (hover: none), (max-width: 760px) {
-		.deck { flex-direction: column; flex: none; height: auto; min-height: 0; }
+	@media (hover: none), (max-width: 900px) {
+		.deck { flex-direction: column; flex: none; height: auto; min-height: 0; container-type: normal; }
 		.panel { flex: none; height: auto; transform: none; grid-template-columns: 1fr; }
 		.panel { background: var(--paper); }
 		.panel:hover, .panel:focus-within { flex: none; transform: none; }

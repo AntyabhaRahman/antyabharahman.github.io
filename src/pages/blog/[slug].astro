@@ -15,7 +15,7 @@ const notes: Record<string, string> = {
 ---
 <Article title={post.data.title} description={post.data.description} kicker={fmt} backHref="/blog/" backLabel="all posts">
 	<div class="meta" slot="meta">
-		{post.data.tags.map((t) => <span class="tag">{t}</span>)}
+		{post.data.tags.map((t) => <span class="tag"><span class="tag-hash">#</span>{t}</span>)}
 	</div>
 	{notes[post.id] && <Note slot="notes" dir="right">{notes[post.id]}</Note>}
 	<Content />

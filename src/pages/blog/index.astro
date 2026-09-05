@@ -15,7 +15,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 
 					<p class="muted" style="margin:0">{p.data.description}</p>
 					<div class="meta">
 						<span class="hand">{fmt(p.data.date)}</span>
-						{p.data.tags.map((t) => <span class="tag">{t}</span>)}
+						{p.data.tags.map((t) => <span class="tag"><span class="tag-hash">#</span>{t}</span>)}
 					</div>
 				</li>
 			))}

@@ -14,7 +14,7 @@ const projects = (await getCollection('projects')).sort((a, b) => b.data.date.va
 					<p class="muted" style="margin:0">{p.data.description}</p>
 					<div class="meta">
 						<span class="hand">{p.data.status === 'active' ? 'in progress' : p.data.date.getFullYear()}</span>
-						{p.data.tags.map((t) => <span class="tag">{t}</span>)}
+						{p.data.tags.map((t) => <span class="tag"><span class="tag-hash">#</span>{t}</span>)}
 						{p.data.repo && <a class="u" href={p.data.repo}>Repo</a>}
 						{p.data.url && <a class="u" href={p.data.url}>Live</a>}
 					</div>
@@ -24,5 +24,6 @@ const projects = (await getCollection('projects')).sort((a, b) => b.data.date.va
 	</main>
 </Base>
 <style>
-	.list--grid { grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); align-items: start; }
+	.list--grid { grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); align-items: stretch; }
+	.list--grid .card { grid-template-rows: auto 1fr auto; }
 </style>
