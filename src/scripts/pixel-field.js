@@ -2,6 +2,8 @@
 // One grid, two modes. 'ambient' draws a terrain as height bands with an optimizer that
 // descends it. 'trail' draws only the pointer trail.
 
+// Run all field motion on the same faster clock; rendering cadence and the real-time theme wipe stay separate.
+const PLAYBACK_RATE = 1.25;
 const PITCH = 9; // cell pitch in CSS px: an 8 px square plus a 1 px gap
 const SQUARE = 8;
 const BRUSH = 7; // brush radius in cells
@@ -68,6 +70,9 @@ export function mountPixelField(canvas, options) {
 	let hash = new Float32Array(0); // fixed per-cell value in [0, 1) that picks the contour dots
 	let time = 0, last = 0, frameId = 0;
 	let live = false; // true while some pointer energy is still worth drawing
+	let selecting = document.getSelection()?.isCollapsed === false;
+	let selectionClick = false, clickPulse = 0;
+	let pendingPulse = null;
 	let onScreen = true;
 	let prevX = 0, prevY = 0, hasPrev = false;
 
@@ -131,26 +136,52 @@ export function mountPixelField(canvas, options) {
 		redraw();
 	}
 
-	function stamp(cx, cy) {
-		const y0 = Math.max(0, Math.floor(cy - BRUSH)), y1 = Math.min(rows - 1, Math.ceil(cy + BRUSH));
-		const x0 = Math.max(0, Math.floor(cx - BRUSH)), x1 = Math.min(cols - 1, Math.ceil(cx + BRUSH));
+	function stamp(cx, cy, radius = BRUSH, strength = 0.9) {
+		const y0 = Math.max(0, Math.floor(cy - radius)), y1 = Math.min(rows - 1, Math.ceil(cy + radius));
+		const x0 = Math.max(0, Math.floor(cx - radius)), x1 = Math.min(cols - 1, Math.ceil(cx + radius));
 		for (let y = y0; y <= y1; y++) {
 			const dy = y - cy;
 			const row = y * cols;
 			for (let x = x0; x <= x1; x++) {
 				const dx = x - cx;
 				const d = Math.sqrt(dx * dx + dy * dy);
-				if (d > BRUSH) continue;
-				const k = 1 - d / BRUSH;
-				const f = 0.9 * k * k * (3 - 2 * k);
+				if (d > radius) continue;
+				const k = 1 - d / radius;
+				const f = strength * k * k * (3 - 2 * k);
 				if (f > energy[row + x]) energy[row + x] = f;
 			}
 		}
 		live = true;
 	}
 
+	function onSelectionChange() {
+		selecting = document.getSelection()?.isCollapsed === false;
+		if (selecting) { hasPrev = false; pendingPulse = null; }
+	}
+
+	function onPointerDown(ev) {
+		selectionClick = ev.pointerType !== 'touch' && ev.button === 0 && document.getSelection()?.isCollapsed === false;
+	}
+
+	function onClick(ev) {
+		const clearedSelection = selectionClick && document.getSelection()?.isCollapsed === true;
+		selectionClick = false;
+		if (!clearedSelection || !cols) return;
+		onSelectionChange();
+		const box = canvas.getBoundingClientRect();
+		const cx = (ev.clientX - box.left) / PITCH, cy = (ev.clientY - box.top) / PITCH;
+		if (cx < 0 || cy < 0 || cx > cols || cy > rows) return;
+		// A small, pale pulse acknowledges deselection without requiring another mouse move.
+		energy.fill(0);
+		live = false;
+		pendingPulse = { cx, cy, frames: 2 };
+		hasPrev = false;
+		start();
+	}
+
 	function onPointerMove(ev) {
 		if (ev.pointerType === 'touch' || cols === 0) return;
+		if (selecting) return;
 		const box = canvas.getBoundingClientRect();
 		const cx = (ev.clientX - box.left) / PITCH;
 		const cy = (ev.clientY - box.top) / PITCH;
@@ -158,6 +189,8 @@ export function mountPixelField(canvas, options) {
 			hasPrev = false;
 			return;
 		}
+		pendingPulse = null;
+		clickPulse = 0;
 		if (hasPrev) {
 			const dist = Math.hypot(cx - prevX, cy - prevY);
 			const steps = Math.min(MAX_STEPS, Math.ceil(dist));
@@ -427,7 +460,13 @@ export function mountPixelField(canvas, options) {
 
 	function decay(dt) {
 		if (!live) return;
-		const k = Math.exp(-dt * DECAY);
+		// Clear existing pointer heat in roughly 80 ms while selecting, using the existing frame loop.
+		let k = Math.exp(-dt * DECAY * (selecting ? 5 : 1));
+		if (clickPulse && !selecting) {
+			const remaining = Math.max(0, clickPulse - dt / PLAYBACK_RATE);
+			k = remaining / clickPulse;
+			clickPulse = remaining;
+		}
 		const n = cols * rows;
 		let peak = 0;
 		for (let i = 0; i < n; i++) {
@@ -450,21 +489,27 @@ export function mountPixelField(canvas, options) {
 	function frame(now) {
 		frameId = requestAnimationFrame(frame);
 		// Slow ambient terrain updates at 30 Hz; pointer heat and theme wipes retain full rate.
-		if (!trail && !live && !wave && now - last < 1000 / 30 - 1) return;
-		const dt = Math.min(0.05, (now - last) / 1000);
+		if (!trail && !live && !wave && !pendingPulse && now - last < 1000 / 30 - 1) return;
+		const dt = Math.min(0.05, (now - last) / 1000) * PLAYBACK_RATE;
 		last = now;
 		time += dt;
 		decay(dt);
+		// Leave one painted frame for the native selection highlight to disappear first.
+		if (pendingPulse && --pendingPulse.frames === 0) {
+			stamp(pendingPulse.cx, pendingPulse.cy, 4, 0.45);
+			clickPulse = 0.25;
+			pendingPulse = null;
+		}
 		if (!trail) advance(dt);
 		if (wave) full = true;
 		compose();
 		paint();
-		if (trail && !live && !wave) stop();
+		if (trail && !live && !wave && !pendingPulse) stop();
 	}
 
 	function start() {
 		if (frameId || !onScreen || cols === 0) return;
-		if (trail && !live && !wave) return;
+		if (trail && !live && !wave && !pendingPulse) return;
 		last = performance.now();
 		frameId = requestAnimationFrame(frame);
 	}
@@ -500,7 +545,10 @@ export function mountPixelField(canvas, options) {
 	});
 	viewWatch.observe(canvas);
 	window.addEventListener('pointermove', onPointerMove, { passive: true });
+	window.addEventListener('pointerdown', onPointerDown, { passive: true });
+	window.addEventListener('click', onClick, { passive: true });
 	document.addEventListener('themechange', onTheme);
+	document.addEventListener('selectionchange', onSelectionChange);
 	resize();
 	start();
 
@@ -510,7 +558,10 @@ export function mountPixelField(canvas, options) {
 			sizeWatch.disconnect();
 			viewWatch.disconnect();
 			window.removeEventListener('pointermove', onPointerMove);
+			window.removeEventListener('pointerdown', onPointerDown);
+			window.removeEventListener('click', onClick);
 			document.removeEventListener('themechange', onTheme);
+			document.removeEventListener('selectionchange', onSelectionChange);
 		},
 	};
 }

@@ -3,7 +3,6 @@ title: Why Adam needs bias correction
 description: Adam starts both moment estimates at zero, and the geometric sum that follows explains the 1 minus beta to the t divisor.
 date: 2026-06-02
 tags: [optimization, adam]
-note: At beta two 0.999, the raw second moment is still 37 percent low at step 1000.
 ---
 
 <!-- Placeholder. Replace this file with your own content. Keep the frontmatter keys. -->
@@ -38,7 +37,7 @@ The geometric sum equals $(1 - \beta_1^t) / (1 - \beta_1)$, and its denominator 
 | 1000 | 0.6323 |
 | 5000 | 0.9933 |
 
-At the default $\beta_2 = 0.999$, the uncorrected second moment sits at a thousandth of its target on step 1 and is still 37 percent low after a thousand steps.
+> At the default $\beta_2 = 0.999$, the uncorrected second moment sits at a thousandth of its target on step 1 and is still 37 percent low after a thousand steps.
 
 The first update shows the cost. With $m_1 = 0.1 g_1$ and $v_1 = 0.001 g_1^2$, the raw ratio $m_1 / \sqrt{v_1}$ has magnitude $0.1 / \sqrt{0.001} \approx 3.16$, so the optimizer moves 3.2 times the learning rate when the design calls for 1. Correction restores $g_1$ and $g_1^2$, and the ratio comes out at exactly 1.
 

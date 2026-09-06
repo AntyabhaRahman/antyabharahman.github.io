@@ -13,10 +13,10 @@ export default defineConfig({
 		},
 	},
 	markdown: {
+		shikiConfig: { themes: { light: 'github-light', dark: 'github-dark' } },
 		processor: unified({
 			remarkPlugins: [remarkMath],
 			rehypePlugins: [rehypeKatex],
-			shikiConfig: { themes: { light: 'github-light', dark: 'github-dark' } },
 		}),
 	},
 });
