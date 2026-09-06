@@ -16,7 +16,7 @@ This is a placeholder entry for a paper that does not exist.
 Softmax attention divides its scores by a fixed constant $\sqrt{d}$. We read that constant as the bandwidth of a Nadaraya Watson kernel and ask whether one value should serve the whole run. We replace it with a schedule $\tau_t$ that starts wide and narrows.
 
 $$
-\tau_t = \tau_{\min} + (\tau_0 - \tau_{\min}) \exp(-t / T)
+\tau_t = \tau_{\mathrm{min}} + (\tau_0 - \tau_{\mathrm{min}}) \exp(-t / T)
 $$
 
 A wide kernel early in training averages over many tokens, which keeps gradients flowing to keys that a sharp head would ignore. Narrowing later lets heads commit to single positions.

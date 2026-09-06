@@ -24,16 +24,28 @@ const canvas = {
 	parentElement: parent,
 	style: {},
 };
-globalThis.window = { devicePixelRatio: 1, addEventListener() {}, removeEventListener() {} };
+const pointerHandlers = new Map();
+globalThis.window = { devicePixelRatio: 1, addEventListener: (name, handler) => pointerHandlers.set(name, handler), removeEventListener: (name) => pointerHandlers.delete(name) };
 globalThis.document = { addEventListener() {}, removeEventListener() {} };
 globalThis.getComputedStyle = () => ({
 	getPropertyValue: (name) => name === '--paper' ? '#fff' : name === '--pf-accent' ? '#000' : '#ddd, #aaa, #777, #444',
 });
 globalThis.ResizeObserver = class { constructor(callback) { this.callback = callback; } observe() { this.callback(); } disconnect() {} };
 globalThis.IntersectionObserver = class { constructor(callback) { this.callback = callback; } observe() { this.callback([{ isIntersecting: true }]); } disconnect() {} };
-globalThis.requestAnimationFrame = () => 1;
+let nextFrame;
+globalThis.performance = { now: () => 0 };
+globalThis.requestAnimationFrame = (callback) => { nextFrame = callback; return 1; };
 globalThis.cancelAnimationFrame = () => {};
 
 const field = mountPixelField(canvas, { mode: 'ambient' });
 assert.ok(fills.some(([x, y, w, h]) => x === 792 && y === 54 && w === 17 && h === 17));
+fills.length = 0;
+nextFrame(16);
+assert.equal(fills.length, 0, 'Idle ambient field skips the intermediate frame.');
+nextFrame(34);
+assert.ok(fills.length > 0, 'Ambient field still paints at 30 Hz.');
+fills.length = 0;
+pointerHandlers.get('pointermove')({ pointerType: 'mouse', clientX: 450, clientY: 220 });
+nextFrame(50);
+assert.ok(fills.length > 0, 'Pointer interaction bypasses the ambient frame limit.');
 field.destroy();

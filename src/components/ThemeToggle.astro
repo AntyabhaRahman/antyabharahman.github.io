@@ -38,7 +38,8 @@
 
 	function apply() {
 		root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-		localStorage.setItem('theme', root.dataset.theme);
+		// Persistence is optional; blocked storage must not interrupt the visible theme update.
+		try { localStorage.setItem('theme', root.dataset.theme); } catch {}
 		sync();
 		document.dispatchEvent(new CustomEvent('themechange', { detail: origin }));
 	}

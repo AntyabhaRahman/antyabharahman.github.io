@@ -5,14 +5,18 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/check-built-security.mjs",
     "preview": "astro preview",
-    "test": "node scripts/check-pixel-field.mjs && node scripts/check-pixel-entrance.mjs"
+    "test": "node scripts/check-pixel-field.mjs && node scripts/check-pixel-entrance.mjs && node scripts/check-theme.mjs"
   },
   "dependencies": {
-    "astro": "^5.18.2",
+    "@astrojs/markdown-remark": "^7.3.0",
+    "astro": "^7.3.1",
     "katex": "^0.16.47",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

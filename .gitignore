@@ -4,3 +4,7 @@ dist/
 .DS_Store
 .playwright-mcp/
 *.png
+
+.env
+.env.*
+!.env.example

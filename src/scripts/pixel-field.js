@@ -187,7 +187,9 @@ export function mountPixelField(canvas, options) {
 		const s3 = Math.sin(wx * 0.074 + ph) + Math.sin(wy * 0.059 - ph + 1.3) + Math.sin((wx + wy) * 0.041 + 2 * ph + 0.4);
 		// A steep rim at the canvas edges keeps the ball inside. The interior stays flat.
 		const bx = (x - cols / 2) / (cols / 2), by = (y - rows / 2) / (rows / 2);
-		const rim = 0.08 * (bx ** 6 + by ** 6);
+		// Multiplication avoids two general-purpose powers for every cell, every frame.
+		const bx2 = bx * bx, by2 = by * by;
+		const rim = 0.08 * (bx2 * bx2 * bx2 + by2 * by2 * by2);
 		return 0.5 + s3 / 6 + rim + HILL * heat(x, y);
 	}
 
@@ -447,6 +449,8 @@ export function mountPixelField(canvas, options) {
 
 	function frame(now) {
 		frameId = requestAnimationFrame(frame);
+		// Slow ambient terrain updates at 30 Hz; pointer heat and theme wipes retain full rate.
+		if (!trail && !live && !wave && now - last < 1000 / 30 - 1) return;
 		const dt = Math.min(0.05, (now - last) / 1000);
 		last = now;
 		time += dt;
