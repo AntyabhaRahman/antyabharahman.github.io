@@ -73,13 +73,13 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 		background: color-mix(in srgb, var(--paper) 78%, transparent); box-shadow: var(--shadow);
 		display: grid; grid-template-columns: auto 1fr; grid-template-rows: minmax(0, 1fr); overflow: hidden;
 		transform: rotate(var(--tilt));
-		transition: flex 620ms cubic-bezier(0.32, 0.72, 0, 1), transform 620ms cubic-bezier(0.32, 0.72, 0, 1), background-color 400ms ease;
+		transition: flex 496ms cubic-bezier(0.32, 0.72, 0, 1), transform 496ms cubic-bezier(0.32, 0.72, 0, 1), background-color 320ms ease;
 	}
 	.deck:has(.panel:hover) .panel, .deck:has(.panel:focus-within) .panel { transform: rotate(0deg); }
 	.panel:hover, .panel:focus-within { flex-grow: 3.2; transform: rotate(0deg) translateY(-4px); background: color-mix(in srgb, var(--paper) 96%, transparent); }
 	.deck:has(.panel:focus-within) .panel:hover:not(:focus-within) { flex-grow: 1; }
 	.panel-side { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1.45rem 0.9rem; }
-	.panel-draw { width: 3rem; height: 3rem; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1), opacity 320ms ease; }
+	.panel-draw { width: 3rem; height: 3rem; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 400ms cubic-bezier(0.32, 0.72, 0, 1), opacity 256ms ease; }
 	.panel-draw .hatch { stroke: var(--graphite); stroke-width: 0.7; opacity: 0.7; }
 	.panel:hover .panel-draw, .panel:focus-within .panel-draw { transform: rotate(-3deg); }
 	.panel-title {
@@ -91,9 +91,9 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 		padding: 2rem 2rem 2rem 0.75rem; min-width: 18rem;
 		display: flex; flex-direction: column; gap: 1.5rem;
 		opacity: 0; transform: translateX(14px);
-		transition: opacity 360ms ease, transform 620ms cubic-bezier(0.32, 0.72, 0, 1);
+		transition: opacity 288ms ease, transform 496ms cubic-bezier(0.32, 0.72, 0, 1);
 	}
-	.panel:hover .panel-body, .panel:focus-within .panel-body { opacity: 1; transform: none; transition-delay: 160ms; }
+	.panel:hover .panel-body, .panel:focus-within .panel-body { opacity: 1; transform: none; transition-delay: 128ms; }
 	.panel-stack { display: flex; flex-direction: column; gap: 1rem; }
 	.panel-spec { margin: 0; display: flex; justify-content: flex-end; gap: 1.15rem; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; flex: 0 1 auto; min-height: 0; overflow: hidden; }
 	@media (max-height: 820px) and (min-width: 901px) { .panel-title { font-size: 2.4rem; } }

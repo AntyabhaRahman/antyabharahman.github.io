@@ -70,7 +70,7 @@ body::before {
 /* Theme swap: circle wipe from the toggle button. skiper26 style. */
 ::view-transition-old(root) { animation: none; }
 ::view-transition-new(root) {
-	animation: theme-wipe 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	animation: theme-wipe 416ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @keyframes theme-wipe {
 	from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
@@ -114,23 +114,23 @@ a { color: inherit; text-decoration: none; }
 	background-size: 0% 1px;
 	background-position: 0 100%;
 	background-repeat: no-repeat;
-	transition: background-size 320ms cubic-bezier(0.2, 0.8, 0.2, 1), color 200ms;
+	transition: background-size 256ms cubic-bezier(0.2, 0.8, 0.2, 1), color 160ms;
 	padding-bottom: 1px;
 }
 .u:hover, .prose a:hover, .u:focus-visible, .prose a:focus-visible { background-size: 100% 1px; color: var(--ink); }
-.prose a, .page-lede a { text-decoration: underline; text-underline-offset: 0.18em; background-image: none; transition: text-decoration-color 320ms ease, color 200ms; }
+.prose a, .page-lede a { text-decoration: underline; text-underline-offset: 0.18em; background-image: none; transition: text-decoration-color 256ms ease, color 160ms; }
 .px-wait [data-px], .px-wait [data-px-border] { visibility: hidden; }
 /* Arrows share the text raster. Decorations fade during the crossover; underlines follow it. */
 .px-live .note svg { transition: none; }
 .px-live .u { background-size: 0% 1px; }
 .px-live :is(.prose, .page-lede) a { text-decoration-color: transparent; }
-.nav a[aria-current='page']::before, .panel-draw, .theme-toggle svg { transition: opacity 320ms ease; }
+.nav a[aria-current='page']::before, .panel-draw, .theme-toggle svg { transition: opacity 256ms ease; }
 /* Hidden under px-wait as well, so the class swap to px-live does not start a fade-out. */
 .px-wait .nav a[aria-current='page']::before, .px-wait .panel-draw, .px-wait .theme-toggle svg, .px-wait .note svg,
 .px-live .nav a[aria-current='page']::before, .px-live .panel-draw, .px-live .theme-toggle svg { opacity: 0; }
 /* Native opacity animation overlaps the text handoff without adding raster or per-frame work. */
 .px-live .panel-draw, .px-live .theme-toggle svg, .px-live .nav a[aria-current='page']::before {
-	animation: px-decoration-in 320ms ease 320ms both;
+	animation: px-decoration-in 256ms ease 256ms both;
 }
 @keyframes px-decoration-in {
 	from { opacity: 0; }

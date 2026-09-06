@@ -8,10 +8,10 @@
 // pseudo element and given the same transform and sketch filter. The displacement noise is
 // anchored at the filtered box's origin, so the cells wobble like the border they become.
 
-const RAMP = 200; // ms for one cell to go from light grey to ink
-const SWEEP = 320; // ms for the sweep to cross the viewport
-const JITTER = 90;
-const FADE = 320; // ms for a lit word to cross over from cells to glyphs
+const RAMP = 160; // ms for one cell to go from light grey to ink
+const SWEEP = 256; // ms for the sweep to cross the viewport
+const JITTER = 72;
+const FADE = 256; // ms for a lit word to cross over from cells to glyphs
 
 function wrapWords(el) {
 	const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);

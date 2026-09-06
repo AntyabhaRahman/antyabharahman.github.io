@@ -64,7 +64,7 @@ export function mountPixelField(canvas, options) {
 	// inside the ring take the new palette; cells outside keep the old one until it passes.
 	let wave = null; // { ox, oy, t0, rmax } in canvas px and real milliseconds, the CSS wipe's clock
 	let inkOld = ink, paperOld = paper;
-	const WAVE = 0.52; // seconds, the length of the CSS theme wipe
+	const WAVE = 0.416; // seconds, the length of the CSS theme wipe
 	let hash = new Float32Array(0); // fixed per-cell value in [0, 1) that picks the contour dots
 	let time = 0, last = 0, frameId = 0;
 	let live = false; // true while some pointer energy is still worth drawing
