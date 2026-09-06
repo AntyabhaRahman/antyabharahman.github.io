@@ -1,0 +1,11 @@
+{
+  "artboards": [
+    { "file": "Current.dc.html", "title": "Today (reference)", "x": 0, "y": 0, "w": 1440, "h": 1100 },
+    { "file": "DirectionA.dc.html", "title": "A. Margin note", "x": 1560, "y": 0, "w": 1440, "h": 1100 },
+    { "file": "DirectionB.dc.html", "title": "B. Index card", "x": 3120, "y": 0, "w": 1440, "h": 1100 },
+    { "file": "DirectionC.dc.html", "title": "C. Spec sheet", "x": 4680, "y": 0, "w": 1440, "h": 1100 },
+    { "file": "DirectionD.dc.html", "title": "D. Statement", "x": 6240, "y": 0, "w": 1440, "h": 1243 },
+    { "file": "Main.dc.html", "title": "Leading candidate", "x": 0, "y": 1400, "w": 1440, "h": 1100 }
+  ],
+  "launch": { "view": "canvas" }
+}

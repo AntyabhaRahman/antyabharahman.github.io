@@ -46,6 +46,8 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+/* Keep centered content fixed when font loading or viewport height changes the scrollbar. */
+html { scrollbar-gutter: stable; }
 
 body {
 	margin: 0;

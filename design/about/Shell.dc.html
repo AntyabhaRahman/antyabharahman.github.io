@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400&display=swap">
+  <style>
+    body { margin: 0; background: #efede6; color: #1a1a1a; font: 400 17px/1.6 'IBM Plex Sans', system-ui, sans-serif; }
+    a { color: #1a1a1a; text-decoration: none; } a:hover { color: #1a1a1a; }
+    .u { background: linear-gradient(#1a1a1a, #1a1a1a) no-repeat 0 100% / 100% 1px; }
+    .display { font-family: 'Archivo', 'IBM Plex Sans', system-ui, sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: -0.03em; line-height: 0.95; }
+    .hand { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11.52px; text-transform: uppercase; letter-spacing: 0.08em; color: #55554f; }
+    .rough { position: relative; }
+    .rough::before { content: ''; position: absolute; inset: 2px; border: 1.5px solid #1a1a1a; border-radius: 3px; filter: url(#sketch); pointer-events: none; }
+    .rough::after { content: ''; position: absolute; inset: 4px 1px 1px 4px; border: 1px solid #55554f; border-radius: 3px; filter: url(#sketch-faint); pointer-events: none; opacity: 0.35; }
+    .panel-title { font-size: 51.2px; writing-mode: vertical-rl; transform: rotate(180deg); margin: auto 0 0; flex-shrink: 0; }
+    .panel-spec { margin: 0; display: flex; justify-content: flex-end; gap: 18.4px; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
+    .panel-spec > div { display: flex; gap: 5.6px; }
+    .panel-spec dd { margin: 0; color: #1a1a1a; }
+    .panel-draw { width: 48px; height: 48px; fill: none; stroke: #1a1a1a; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .panel-draw .hatch { stroke: #55554f; stroke-width: 0.7; opacity: 0.7; }
+  </style>
+</helmet>
+<div style="position: relative; width: 1440px; min-height: 1100px; display: flex; flex-direction: column; overflow: hidden; background: #efede6;">
+  <svg width="0" height="0" aria-hidden="true" style="position: absolute;">
+    <filter id="sketch" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="7" result="n"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+    <filter id="sketch-faint" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="2" seed="19" result="n"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+  </svg>
+
+  <!-- Header, as on the live site -->
+  <header style="width: 1152px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 17.6px 0; position: relative; z-index: 2;">
+    <div style="display: flex; gap: 22.4px; align-items: baseline;">
+      <a href="#" style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12.8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #1a1a1a; line-height: 1; white-space: nowrap;">Antyabha Rahman</a>
+      <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11.52px; text-transform: uppercase; letter-spacing: 0.1em; color: #55554f; white-space: nowrap;">Engineer and researcher</span>
+    </div>
+    <nav style="display: flex; gap: 25.6px; align-items: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12.48px; text-transform: uppercase; letter-spacing: 0.08em;">
+      <a href="#" style="color: #55554f;">Projects</a>
+      <a href="#" style="color: #55554f;">Blog</a>
+      <a href="#" style="color: #55554f;">Research</a>
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px; fill: none; stroke: #1a1a1a; stroke-width: 1.5; stroke-linecap: round;">
+        <path d="M12 7.4 C18.1 7.1 18.4 16.5 12.2 16.7 C6 17 5.9 7.8 12 7.4Z"></path>
+        <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7"></path>
+      </svg>
+    </nav>
+  </header>
+
+  <!-- Hero: the pixel field runs behind everything below the header -->
+  <section style="position: relative; flex: 1 1 auto; display: flex; flex-direction: column; padding: 63px 0 24px;">
+    <img src="field.png" alt="" style="position: absolute; left: 0; top: 0; width: 1440px; height: 751px; pointer-events: none;">
+    <div style="position: relative; z-index: 1; width: 1152px; margin: 0 auto; display: flex; flex-direction: column; gap: 0;">
+
+      <!-- ABOUT BLOCK GOES HERE -->
+
+      <!-- Deck at rest, as on the live site -->
+      <div style="display: flex; gap: 20px; align-items: flex-start;">
+        <article class="rough" style="height: 640px; flex: 1 1 0; min-width: 88px; background: rgba(239, 237, 230, 0.78); box-shadow: 3px 4px 0 rgba(26, 26, 26, 0.08); display: grid; grid-template-columns: auto 1fr; grid-template-rows: minmax(0, 1fr); overflow: hidden; transform: rotate(-0.7deg);">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 23.2px 14.4px;">
+            <svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true"><path class="hatch" d="M9 40 l4 -4 M9 36 l7 -7 M9 32 l5 -5 M36 40 l4 -4 M33 40 l7 -7"></path><path d="M8 10 h32 v30 h-32 z M14 22 l3 3 M31 22 l3 3 M17 33 c6 4 10 4 16 0 M4 44 h40"></path></svg>
+            <dl class="panel-spec hand"><div><dt>Entries</dt><dd>03</dd></div><div><dd>Aug 2026</dd></div></dl>
+            <h2 class="panel-title display" style="margin: auto 0 0;"><a href="#">Projects</a></h2>
+          </div>
+          <div></div>
+        </article>
+        <article class="rough" style="height: 576px; flex: 1 1 0; min-width: 88px; background: rgba(239, 237, 230, 0.78); box-shadow: 3px 4px 0 rgba(26, 26, 26, 0.08); display: grid; grid-template-columns: auto 1fr; grid-template-rows: minmax(0, 1fr); overflow: hidden; transform: rotate(0.45deg);">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 23.2px 14.4px;">
+            <svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true"><path class="hatch" d="M11 42 l5 -5 M11 38 l4 -4 M33 8 l6 6 M35 7 l4 4"></path><path d="M10 6 h22 l8 8 v30 h-30 z M32 6 v8 h8 M16 23 h17 M16 29 h9 M16 36 h7 M29 30 l12 11 -3 3 -12 -11 z M29 30 l-3 3"></path></svg>
+            <dl class="panel-spec hand"><div><dt>Entries</dt><dd>02</dd></div><div><dd>Jun 2026</dd></div></dl>
+            <h2 class="panel-title display" style="margin: auto 0 0;"><a href="#">Blog</a></h2>
+          </div>
+          <div></div>
+        </article>
+        <article class="rough" style="height: 576px; flex: 1 1 0; min-width: 88px; background: rgba(239, 237, 230, 0.78); box-shadow: 3px 4px 0 rgba(26, 26, 26, 0.08); display: grid; grid-template-columns: auto 1fr; grid-template-rows: minmax(0, 1fr); overflow: hidden; transform: rotate(-0.35deg);">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 23.2px 14.4px;">
+            <svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true"><path class="hatch" d="M14 39 l4 -4 M17 42 l6 -7 M22 43 l7 -8 M28 43 l6 -7 M33 43 l3 -4 M16 37 l7 6 M22 36 l8 7 M29 36 l7 6"></path><path d="M20 4 h10 M22 4 v12 l-12 24 c-2 4 1 6 4 6 h22 c3 0 6 -2 4 -6 l-12 -24 v-12 M14 34 c6 -4 8 2 12 -2 c3 -3 6 4 10 0"></path></svg>
+            <dl class="panel-spec hand"><div><dt>Entries</dt><dd>02</dd></div><div><dd>Jul 2026</dd></div></dl>
+            <h2 class="panel-title display" style="margin: auto 0 0;"><a href="#">Research</a></h2>
+          </div>
+          <div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <footer style="width: 1152px; margin: auto auto 0; padding: 32px 0 22.4px; color: #55554f; font-size: 15.3px; display: flex; justify-content: space-between; position: relative; z-index: 1;">
+    <span>© 2026 Antyabha Rahman</span>
+    <a href="#" style="color: #55554f;">github.com/AntyabhaRahman</a>
+  </footer>
+</div>
+</x-dc>
+</body>
+</html>
