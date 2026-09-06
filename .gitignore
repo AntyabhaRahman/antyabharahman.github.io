@@ -8,3 +8,7 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Keep the private resume out of the repository and public assets.
+/Resume copy.pdf
+/public/cv.pdf

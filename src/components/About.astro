@@ -12,11 +12,11 @@ const { city = '[CITY]', email, cv } = Astro.props;
 			<h1 id="about-name" class="display">Antyabha Rahman</h1>
 			<div class="about-role hand"><span>Engineer and researcher</span><span class="about-rule" aria-hidden="true"></span><span>{city}</span></div>
 		</div>
-		<p class="about-copy">I build software and do research in machine learning.<span class="copy-break"></span> The blog is working notes on optimisers, attention, and the maths under them.</p>
+		<p class="about-copy">working on ai safety</p>
 		<div class="about-links">
-			<a class="u" href="https://github.com/AntyabhaRahman">GitHub</a>
-			{email ? <a class="u" href={`mailto:${email}`}>Email</a> : <span>[EMAIL]</span>}
-			{cv ? <a class="u" href={cv}>CV</a> : <span>[CV]</span>}
+			<a class="u" href="https://github.com/AntyabhaRahman">github</a>
+			{email ? <span class="about-email">{email.replaceAll('@', ' [at] ')}</span> : <span>[EMAIL]</span>}
+			{cv ? <a class="u" href={cv}>resume</a> : <span>Resume available on request via email</span>}
 		</div>
 	</div>
 </section>
@@ -30,9 +30,10 @@ const { city = '[CITY]', email, cv } = Astro.props;
 	.about-role { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.8rem; }
 	.about-rule { width: 0.9rem; height: 1px; background: var(--pencil); flex: none; }
 	.about-copy { margin: 0; font-size: 1.0625rem; line-height: 1.6; }
-	.copy-break { display: block; }
 	.about-links { display: flex; flex-wrap: wrap; align-items: center; gap: 1.4rem; font: 400 0.78rem/1.6 var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
 	.about-links > span { color: var(--graphite); }
+	.about-links > a { text-transform: none; }
+	.about-links > .about-email { color: var(--ink); text-transform: none; overflow-wrap: anywhere; min-width: 0; }
 	@media (hover: none), (max-width: 900px) {
 		.about { width: 100%; transform: none; background: var(--paper); padding: 1.2rem 1.2rem 1.4rem; grid-template-columns: 4rem minmax(0, 1fr); gap: 0.8rem 1rem; }
 		.about-text { display: contents; }
@@ -40,7 +41,6 @@ const { city = '[CITY]', email, cv } = Astro.props;
 		.about h1 { font-size: 1.625rem; }
 		.about-role { gap: 0.6rem; }
 		.about-copy, .about-links { grid-column: 1 / -1; }
-		.copy-break { display: none; }
 		.about-links a { display: inline-flex; align-items: center; min-height: 44px; padding-block: 0.6rem; margin-block: -0.6rem; }
 	}
 </style>
