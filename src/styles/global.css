@@ -120,7 +120,7 @@ a { color: inherit; text-decoration: none; }
 .u:hover, .prose a:hover, .u:focus-visible, .prose a:focus-visible { background-size: 100% 1px; color: var(--ink); }
 .prose a, .page-lede a { text-decoration: underline; text-underline-offset: 0.18em; background-image: none; transition: text-decoration-color 320ms ease, color 200ms; }
 .px-wait [data-px], .px-wait [data-px-border] { visibility: hidden; }
-/* Arrows share the text raster. Underlines, nav marks, drawings and the toggle wait. They grow or fade in when the last word is solid. */
+/* Arrows share the text raster. Decorations fade during the crossover; underlines follow it. */
 .px-live .note svg { transition: none; }
 .px-live .u { background-size: 0% 1px; }
 .px-live :is(.prose, .page-lede) a { text-decoration-color: transparent; }
@@ -128,6 +128,14 @@ a { color: inherit; text-decoration: none; }
 /* Hidden under px-wait as well, so the class swap to px-live does not start a fade-out. */
 .px-wait .nav a[aria-current='page']::before, .px-wait .panel-draw, .px-wait .theme-toggle svg, .px-wait .note svg,
 .px-live .nav a[aria-current='page']::before, .px-live .panel-draw, .px-live .theme-toggle svg { opacity: 0; }
+/* Native opacity animation overlaps the text handoff without adding raster or per-frame work. */
+.px-live .panel-draw, .px-live .theme-toggle svg, .px-live .nav a[aria-current='page']::before {
+	animation: px-decoration-in 320ms ease 320ms both;
+}
+@keyframes px-decoration-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
 
 /* Rough outline. A pseudo element passes through the SVG displacement filter so text stays sharp. */
