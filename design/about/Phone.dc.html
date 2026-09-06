@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400&display=swap">
+  <style>
+    body { margin: 0; background: #efede6; color: #1a1a1a; font: 400 16px/1.6 'IBM Plex Sans', system-ui, sans-serif; }
+    a { color: #1a1a1a; text-decoration: none; } a:hover { color: #1a1a1a; }
+    .u { background: linear-gradient(#1a1a1a, #1a1a1a) no-repeat 0 100% / 100% 1px; }
+    .display { font-family: 'Archivo', 'IBM Plex Sans', system-ui, sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: -0.03em; line-height: 0.95; }
+    .hand { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11.52px; text-transform: uppercase; letter-spacing: 0.08em; color: #55554f; }
+    .rough { position: relative; }
+    .rough::before { content: ''; position: absolute; inset: 2px; border: 1.5px solid #1a1a1a; border-radius: 3px; filter: url(#sketch); pointer-events: none; }
+    .rough::after { content: ''; position: absolute; inset: 4px 1px 1px 4px; border: 1px solid #55554f; border-radius: 3px; filter: url(#sketch-faint); pointer-events: none; opacity: 0.35; }
+    .panel-draw { width: 48px; height: 48px; fill: none; stroke: #1a1a1a; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .panel-draw .hatch { stroke: #55554f; stroke-width: 0.7; opacity: 0.7; }
+    .sheet { background: #efede6; display: flex; flex-direction: column; }
+    .sheet-side { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding: 19.2px 19.2px 0; align-items: start; }
+    .sheet-title { grid-column: 1; grid-row: 1; margin: 0; font-size: 31.2px; }
+    .sheet-side .panel-draw { grid-column: 2; grid-row: 1; }
+    .spec { grid-column: 1 / -1; grid-row: 2; margin: 0; display: flex; gap: 18.4px; flex-wrap: wrap; }
+    .spec > div { display: flex; gap: 4px; }
+    .spec dd { margin: 0; color: #1a1a1a; }
+    .sheet-body { padding: 16px 19.2px 22.4px; display: flex; flex-direction: column; gap: 16px; }
+    .blurb { margin: 0; color: #55554f; }
+    .items { list-style: none; margin: 0; padding: 0; display: grid; gap: 11.2px; }
+    .items li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4.8px 12.8px; line-height: 1.35; }
+    .items .hand { font-size: 11.2px; }
+    .all { align-self: flex-start; font-size: 15.2px; }
+    .mono-link { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12.48px; text-transform: uppercase; letter-spacing: 0.08em; }
+  </style>
+</helmet>
+<div style="position: relative; width: 390px; min-height: 1700px; display: flex; flex-direction: column; overflow: hidden; background: #efede6;">
+  <svg width="0" height="0" aria-hidden="true" style="position: absolute;">
+    <filter id="sketch" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="7" result="n"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+    <filter id="sketch-faint" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="2" seed="19" result="n"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+  </svg>
+
+  <!-- Header, as it wraps on a phone -->
+  <header style="width: 350px; margin: 0 auto; display: flex; flex-direction: column; gap: 7.2px; padding: 18.4px 0 10.4px; position: relative; z-index: 2;">
+    <div style="display: flex; gap: 22.4px; align-items: baseline; flex-wrap: wrap;">
+      <a href="#" style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12.8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: #1a1a1a; line-height: 1; white-space: nowrap;">Antyabha Rahman</a>
+      <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11.52px; text-transform: uppercase; letter-spacing: 0.1em; color: #55554f; white-space: nowrap;">Engineer and researcher</span>
+    </div>
+    <nav style="display: flex; gap: 25.6px; align-items: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12.48px; text-transform: uppercase; letter-spacing: 0.08em; height: 35px;">
+      <a href="#" style="color: #55554f;">Projects</a>
+      <a href="#" style="color: #55554f;">Blog</a>
+      <a href="#" style="color: #55554f;">Research</a>
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px; fill: none; stroke: #1a1a1a; stroke-width: 1.5; stroke-linecap: round; margin-left: auto;">
+        <path d="M12 7.4 C18.1 7.1 18.4 16.5 12.2 16.7 C6 17 5.9 7.8 12 7.4Z"></path>
+        <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7"></path>
+      </svg>
+    </nav>
+  </header>
+
+  <section style="position: relative; flex: 1 1 auto; display: flex; flex-direction: column; padding: 16px 0 24px;">
+    <img src="field.png" alt="" style="position: absolute; left: 0; top: 0; width: 1440px; height: 100%; object-fit: cover; object-position: left top; pointer-events: none; opacity: 0.9;">
+    <div style="position: relative; z-index: 1; width: 350px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+
+      <!-- About card: full width on a phone, portrait beside the name, copy below -->
+      <article class="rough" style="box-sizing: border-box; background: #efede6; box-shadow: 3px 4px 0 rgba(26, 26, 26, 0.08); display: flex; flex-direction: column; gap: 12.8px; padding: 19.2px 19.2px 22.4px;">
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true" style="width: 64px; height: 64px; flex-shrink: 0;">
+            <path class="hatch" d="M9 41 l5 -5 M9 37 l4 -4 M38 41 l4 -4 M35 41 l7 -7"></path>
+            <path d="M6 5 h36 v38 h-36 z M24 11.5 c4.1 0 7.5 3.4 7.5 7.5 c0 4.1 -3.4 7.5 -7.5 7.5 c-4.1 0 -7.5 -3.4 -7.5 -7.5 c0 -4.1 3.4 -7.5 7.5 -7.5 z M21 17.6 h1.7 M25.3 17.6 h1.7 M21.4 22.4 c1.6 1.6 3.6 1.6 5.2 0 M11 43 c1.6 -8 6.6 -12 13 -12 c6.4 0 11.4 4 13 12"></path>
+          </svg>
+          <div style="display: flex; flex-direction: column; gap: 6.4px; min-width: 0;">
+            <h2 class="display" style="margin: 0; font-size: 26px;">Antyabha Rahman</h2>
+            <div class="hand" style="display: flex; align-items: center; gap: 9.6px; flex-wrap: wrap;">
+              <span>Engineer and researcher</span>
+              <span style="width: 14.4px; height: 1px; background: #b8b5ac; flex-shrink: 0;"></span>
+              <span>[CITY]</span>
+            </div>
+          </div>
+        </div>
+        <p style="margin: 0;">I build software and do research in machine learning. The blog is working notes on optimisers, attention, and the maths under them.</p>
+        <div class="mono-link" style="display: flex; gap: 22.4px; flex-wrap: wrap;">
+          <a class="u" href="https://github.com/AntyabhaRahman">GitHub</a>
+          <a class="u" href="#">[EMAIL]</a>
+          <a class="u" href="#">[CV]</a>
+        </div>
+      </article>
+
+      <!-- Stacked sheets, as on the live phone layout -->
+      <article class="rough sheet">
+        <div class="sheet-side">
+          <h2 class="sheet-title display"><a href="#">Projects</a></h2>
+          <svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true"><path class="hatch" d="M9 40 l4 -4 M9 36 l7 -7 M9 32 l5 -5 M36 40 l4 -4 M33 40 l7 -7"></path><path d="M8 10 h32 v30 h-32 z M14 22 l3 3 M31 22 l3 3 M17 33 c6 4 10 4 16 0 M4 44 h40"></path></svg>
+          <dl class="spec hand"><div><dt>Entries</dt><dd>03</dd></div><div><dd>Aug 2026</dd></div></dl>
+        </div>
+        <div class="sheet-body">
+          <p class="blurb">Things I built. Code, tools, and the occasional hardware.</p>
+          <ol class="items">
+            <li><a class="u" href="#">Placeholder project three</a><span class="hand">Aug 2026</span></li>
+            <li><a class="u" href="#">Placeholder project two</a><span class="hand">May 2026</span></li>
+            <li><a class="u" href="#">Placeholder project one</a><span class="hand">Mar 2026</span></li>
+          </ol>
+          <a class="all u" href="#">All projects</a>
+        </div>
+      </article>
+      <article class="rough sheet">
+        <div class="sheet-side">
+          <h2 class="sheet-title display"><a href="#">Blog</a></h2>
+          <svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true"><path class="hatch" d="M11 42 l5 -5 M11 38 l4 -4 M33 8 l6 6 M35 7 l4 4"></path><path d="M10 6 h22 l8 8 v30 h-30 z M32 6 v8 h8 M16 23 h17 M16 29 h9 M16 36 h7 M29 30 l12 11 -3 3 -12 -11 z M29 30 l-3 3"></path></svg>
+          <dl class="spec hand"><div><dt>Entries</dt><dd>02</dd></div><div><dd>Jun 2026</dd></div></dl>
+        </div>
+        <div class="sheet-body">
+          <p class="blurb">Working notes on machine learning and maths. Equations included.</p>
+          <ol class="items">
+            <li><a class="u" href="#">Why Adam needs bias correction</a><span class="hand">Jun 2026</span></li>
+            <li><a class="u" href="#">Attention as kernel smoothing</a><span class="hand">Apr 2026</span></li>
+          </ol>
+          <a class="all u" href="#">All blog</a>
+        </div>
+      </article>
+      <article class="rough sheet">
+        <div class="sheet-side">
+          <h2 class="sheet-title display"><a href="#">Research</a></h2>
+          <svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true"><path class="hatch" d="M14 39 l4 -4 M17 42 l6 -7 M22 43 l7 -8 M28 43 l6 -7 M33 43 l3 -4 M16 37 l7 6 M22 36 l8 7 M29 36 l7 6"></path><path d="M20 4 h10 M22 4 v12 l-12 24 c-2 4 1 6 4 6 h22 c3 0 6 -2 4 -6 l-12 -24 v-12 M14 34 c6 -4 8 2 12 -2 c3 -3 6 4 10 0"></path></svg>
+          <dl class="spec hand"><div><dt>Entries</dt><dd>02</dd></div><div><dd>Jul 2026</dd></div></dl>
+        </div>
+        <div class="sheet-body">
+          <p class="blurb">Papers and preprints, with the short version of each.</p>
+          <ol class="items">
+            <li><a class="u" href="#">Placeholder paper two</a><span class="hand">Jul 2026</span></li>
+            <li><a class="u" href="#">Placeholder paper one</a><span class="hand">Feb 2026</span></li>
+          </ol>
+          <a class="all u" href="#">All research</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer style="width: 350px; margin: auto auto 0; padding: 32px 0 22.4px; color: #55554f; font-size: 14.4px; display: flex; flex-direction: column; gap: 9.6px; position: relative; z-index: 1;">
+    <span>© 2026 Antyabha Rahman</span>
+    <a href="#" style="color: #55554f;">github.com/AntyabhaRahman</a>
+  </footer>
+</div>
+</x-dc>
+</body>
+</html>

@@ -62,7 +62,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 <style>
 	.deck {
 		display: flex; gap: 1.25rem; align-items: flex-start;
-		flex: 1 1 auto; min-height: 20rem;
+		flex: 1 1 auto; min-height: clamp(34rem, 65svh, 38rem);
 		position: relative; z-index: 1;
 		container-type: size;
 	}
@@ -79,11 +79,11 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.panel:hover, .panel:focus-within { flex-grow: 3.2; transform: rotate(0deg) translateY(-4px); background: color-mix(in srgb, var(--paper) 96%, transparent); }
 	.deck:has(.panel:focus-within) .panel:hover:not(:focus-within) { flex-grow: 1; }
 	.panel-side { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1.45rem 0.9rem; }
-	.panel-draw { width: 3rem; height: 3rem; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 400ms cubic-bezier(0.32, 0.72, 0, 1), opacity 256ms ease; }
+	.panel-draw { width: 3rem; height: 3rem; flex-shrink: 0; fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 400ms cubic-bezier(0.32, 0.72, 0, 1), opacity 256ms ease; }
 	.panel-draw .hatch { stroke: var(--graphite); stroke-width: 0.7; opacity: 0.7; }
 	.panel:hover .panel-draw, .panel:focus-within .panel-draw { transform: rotate(-3deg); }
 	.panel-title {
-		margin: auto 0 0; font-size: clamp(1.7rem, 4vw, 3.2rem); flex-shrink: 0;
+		margin: auto 0 0; font-size: clamp(2.4rem, calc(var(--deck-h, 544px) * 0.2 - 4.4rem), 3.2rem); flex-shrink: 0;
 		writing-mode: vertical-rl; transform: rotate(180deg); line-height: 1;
 	}
 	.panel-title a { display: block; }
@@ -96,7 +96,6 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.panel:hover .panel-body, .panel:focus-within .panel-body { opacity: 1; transform: none; transition-delay: 128ms; }
 	.panel-stack { display: flex; flex-direction: column; gap: 1rem; }
 	.panel-spec { margin: 0; display: flex; justify-content: flex-end; gap: 1.15rem; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; flex: 0 1 auto; min-height: 0; overflow: hidden; }
-	@media (max-height: 820px) and (min-width: 901px) { .panel-title { font-size: 2.4rem; } }
 	/* A short window has no room on the spine for the spec. */
 	@media (max-height: 740px) and (min-width: 901px) { .panel-spec { display: none; } }
 	.panel-spec > div { display: flex; gap: 0.35rem; }

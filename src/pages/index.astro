@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Deck from '../components/Deck.astro';
+import About from '../components/About.astro';
 import PixelCanvas from '../components/PixelCanvas.astro';
 import { byDate } from '../utils';
 
@@ -24,7 +25,7 @@ const panels = [
 	<section class="hero">
 		<PixelCanvas mode="ambient" class="hero-canvas" />
 		<div class="wrap hero-inner">
-			<h1 class="sr">Antyabha Rahman</h1>
+			<About />
 			<Deck panels={panels} />
 		</div>
 	</section>
@@ -34,5 +35,6 @@ const panels = [
 	/* The hero takes every pixel between the header and the footer, so the field runs down to the footer. */
 	.hero { position: relative; padding: clamp(2rem, 7vh, 4.5rem) 0 1.5rem; overflow: hidden; flex: 1 1 auto; display: flex; flex-direction: column; }
 	@media (max-width: 900px) { .hero { padding-top: 1rem; } }
-	.hero-inner { position: relative; z-index: 1; flex: 1 1 auto; display: flex; flex-direction: column; }
+	.hero-inner { position: relative; z-index: 1; flex: 1 1 auto; display: flex; flex-direction: column; gap: 1.7rem; }
+	@media (hover: none), (max-width: 900px) { .hero-inner { gap: 1.25rem; } }
 </style>

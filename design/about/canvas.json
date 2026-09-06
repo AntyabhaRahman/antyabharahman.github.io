@@ -1,11 +1,26 @@
 {
-  "artboards": [
-    { "file": "Current.dc.html", "title": "Today (reference)", "x": 0, "y": 0, "w": 1440, "h": 1100 },
-    { "file": "DirectionA.dc.html", "title": "A. Margin note", "x": 1560, "y": 0, "w": 1440, "h": 1100 },
-    { "file": "DirectionB.dc.html", "title": "B. Index card", "x": 3120, "y": 0, "w": 1440, "h": 1100 },
-    { "file": "DirectionC.dc.html", "title": "C. Spec sheet", "x": 4680, "y": 0, "w": 1440, "h": 1100 },
-    { "file": "DirectionD.dc.html", "title": "D. Statement", "x": 6240, "y": 0, "w": 1440, "h": 1243 },
-    { "file": "Main.dc.html", "title": "Leading candidate", "x": 0, "y": 1400, "w": 1440, "h": 1100 }
+  "pages": [
+    { "id": "page-1", "name": "B. Index card" },
+    { "id": "page-2", "name": "Directions (archive)" }
   ],
-  "launch": { "view": "canvas" }
+  "artboards": [
+    { "file": "Main.dc.html", "title": "Desktop 1440, light", "x": 0, "y": 0, "w": 1440, "h": 1100, "page": "page-1" },
+    { "file": "Dark.dc.html", "title": "Desktop 1440, dark", "x": 1560, "y": 0, "w": 1440, "h": 1100, "page": "page-1" },
+    { "file": "Phone.dc.html", "title": "Phone 390", "x": 3120, "y": 0, "w": 390, "h": 1700, "page": "page-1" },
+    { "file": "Current.dc.html", "title": "Today (reference)", "x": 0, "y": 0, "w": 1440, "h": 1100, "page": "page-2" },
+    { "file": "DirectionA.dc.html", "title": "A. Margin note", "x": 1560, "y": 0, "w": 1440, "h": 1100, "page": "page-2" },
+    { "file": "DirectionB.dc.html", "title": "B. Index card (picked)", "x": 3120, "y": 0, "w": 1440, "h": 1100, "page": "page-2" },
+    { "file": "DirectionC.dc.html", "title": "C. Spec sheet", "x": 4680, "y": 0, "w": 1440, "h": 1100, "page": "page-2" },
+    { "file": "DirectionD.dc.html", "title": "D. Statement", "x": 6240, "y": 0, "w": 1440, "h": 1243, "page": "page-2" }
+  ],
+  "annotations": [
+    { "id": "pick", "x": 0, "y": -300, "w": 620, "page": "page-1", "text": "Direction B, picked 2026-09-06. The about card is cut from the same paper as the sheets: same rough border, 78 percent paper fill, shadow, and a -0.55 degree tilt. Words in [BRACKETS] are facts still to fill in: city, email, CV link. The portrait is a sketch placeholder in the icon style until there is a real drawing or photo." },
+    { "id": "open", "x": 700, "y": -300, "w": 620, "page": "page-1", "text": "One open decision. To keep the deck above a 900 px fold, the sheets lost 70 px and the spine titles dropped from 51 to 38 px, the site's own short-window size. The alternative keeps the 51 px titles and lets the deck run about 70 px past the fold. The spec lists both." },
+    { "id": "phone-note", "x": 3120, "y": -300, "w": 390, "page": "page-1", "text": "On a phone the card is full width and stacks above the sheets. Portrait 64 px beside the name, copy below, links in one row. The sheets keep their live phone layout." },
+    { "id": "brief", "x": 0, "y": -260, "w": 620, "page": "page-2", "text": "The four directions from the first round, kept for reference. B was picked." },
+    { "id": "note-a", "x": 1560, "y": -260, "w": 480, "page": "page-2", "text": "A. Margin note. Smallest footprint: 54 px. Trade-off: the name appears twice within 32 px." },
+    { "id": "note-c", "x": 4680, "y": -260, "w": 480, "page": "page-2", "text": "C. Spec sheet. Two-line statement plus four numbered rows in the spine's label vocabulary. Trade-off: the facts sit at label size." },
+    { "id": "note-d", "x": 6240, "y": -260, "w": 480, "page": "page-2", "text": "D. Statement. A 107 px headline; the deck becomes the second beat. Trade-off: the deck starts at 500 px." }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" }
 }

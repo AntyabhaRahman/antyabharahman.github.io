@@ -126,12 +126,12 @@ a { color: inherit; text-decoration: none; }
 .px-live .note svg { transition: none; }
 .px-live .u { background-size: 0% 1px; }
 .px-live :is(.prose, .page-lede) a { text-decoration-color: transparent; }
-.nav a[aria-current='page']::before, .panel-draw, .theme-toggle svg { transition: opacity 256ms ease; }
+.nav a[aria-current='page']::before, .panel-draw, .about-draw, .theme-toggle svg { transition: opacity 256ms ease; }
 /* Hidden under px-wait as well, so the class swap to px-live does not start a fade-out. */
-.px-wait .nav a[aria-current='page']::before, .px-wait .panel-draw, .px-wait .theme-toggle svg, .px-wait .note svg,
-.px-live .nav a[aria-current='page']::before, .px-live .panel-draw, .px-live .theme-toggle svg { opacity: 0; }
+.px-wait .nav a[aria-current='page']::before, .px-wait .panel-draw, .px-wait .about-draw, .px-wait .theme-toggle svg, .px-wait .note svg,
+.px-live .nav a[aria-current='page']::before, .px-live .panel-draw, .px-live .about-draw, .px-live .theme-toggle svg { opacity: 0; }
 /* Native opacity animation overlaps the text handoff without adding raster or per-frame work. */
-.px-live .panel-draw, .px-live .theme-toggle svg, .px-live .nav a[aria-current='page']::before {
+.px-live .panel-draw, .px-live .about-draw, .px-live .theme-toggle svg, .px-live .nav a[aria-current='page']::before {
 	animation: px-decoration-in 256ms ease 256ms both;
 }
 @keyframes px-decoration-in {
