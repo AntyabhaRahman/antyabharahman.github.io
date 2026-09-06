@@ -89,7 +89,7 @@ code, pre, kbd { font-family: var(--font-mono); font-size: 0.92em; }
 pre { padding: 1rem 1.1rem; overflow-x: auto; background: var(--paper-2); border-radius: 2px; }
 /* Shiki writes both themes as custom properties. The block takes the paper tone, not Shiki's white. */
 .astro-code { background-color: var(--paper-2) !important; }
-[data-theme='dark'] .astro-code, [data-theme='dark'] .astro-code span { color: var(--shiki-dark) !important; font-style: var(--shiki-dark-font-style) !important; font-weight: var(--shiki-dark-font-weight) !important; }
+[data-theme='dark'] .astro-code, [data-theme='dark'] .astro-code span:not(.px-w) { color: var(--shiki-dark) !important; font-style: var(--shiki-dark-font-style) !important; font-weight: var(--shiki-dark-font-weight) !important; }
 :not(pre) > code { background: var(--paper-2); padding: 0.05em 0.35em; border-radius: 2px; }
 table { border-collapse: collapse; margin: 1.2em 0; width: 100%; }
 th, td { text-align: left; padding: 0.45em 0.7em; border-bottom: 1px solid var(--pencil); }
@@ -103,7 +103,6 @@ img { max-width: 100%; }
 @media (max-width: 640px) {
 	.nav { gap: 1rem; font-size: 0.9rem; }
 	.katex-display { font-size: 0.9em; grid-template-columns: minmax(0, 1fr) 2.25rem; }
-	.katex-display > .katex { mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); }
 }
 
 /* Links. The underline grows from the left. skiper40 style. */
@@ -119,15 +118,16 @@ a { color: inherit; text-decoration: none; }
 	padding-bottom: 1px;
 }
 .u:hover, .prose a:hover, .u:focus-visible, .prose a:focus-visible { background-size: 100% 1px; color: var(--ink); }
-.prose a, .page-lede a { text-decoration: underline; text-underline-offset: 0.18em; background-image: none; }
+.prose a, .page-lede a { text-decoration: underline; text-underline-offset: 0.18em; background-image: none; transition: text-decoration-color 320ms ease, color 200ms; }
 .px-wait [data-px], .px-wait [data-px-border] { visibility: hidden; }
-/* During the entrance, underlines, tag marks, drawings and the toggle wait. They grow or fade in when the last word is solid. */
+/* Arrows share the text raster. Underlines, nav marks, drawings and the toggle wait. They grow or fade in when the last word is solid. */
+.px-live .note svg { transition: none; }
 .px-live .u { background-size: 0% 1px; }
 .px-live :is(.prose, .page-lede) a { text-decoration-color: transparent; }
-.nav a[aria-current='page']::before, .panel-draw, .theme-toggle svg, .note svg { transition: opacity 320ms ease; }
+.nav a[aria-current='page']::before, .panel-draw, .theme-toggle svg { transition: opacity 320ms ease; }
 /* Hidden under px-wait as well, so the class swap to px-live does not start a fade-out. */
 .px-wait .nav a[aria-current='page']::before, .px-wait .panel-draw, .px-wait .theme-toggle svg, .px-wait .note svg,
-.px-live .nav a[aria-current='page']::before, .px-live .panel-draw, .px-live .theme-toggle svg, .px-live .note svg { opacity: 0; }
+.px-live .nav a[aria-current='page']::before, .px-live .panel-draw, .px-live .theme-toggle svg { opacity: 0; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
 
 /* Rough outline. A pseudo element passes through the SVG displacement filter so text stays sharp. */
@@ -209,8 +209,12 @@ canvas.pf { display: block; pointer-events: none; opacity: var(--pf-opacity, 0.8
 }
 .hero-canvas { position: absolute; inset: 0; z-index: 0; }
 
+@media (max-width: 640px) {
+	.site-header { padding-top: 1.6rem; }
+}
+
 @media (max-width: 399px) {
-	.site-header { padding-block: 0.65rem; row-gap: 0.45rem; }
+	.site-header { padding-block: 1.15rem 0.65rem; row-gap: 0.45rem; }
 	.role { display: none; }
 	.nav { width: 100%; justify-content: space-between; gap: clamp(0.35rem, 2vw, 0.75rem); }
 }

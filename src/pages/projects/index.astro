@@ -25,6 +25,6 @@ const projects = (await getCollection('projects')).sort(byDate);
 	</main>
 </Base>
 <style>
-	.list--grid { grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); align-items: stretch; }
+	.list--grid { grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr)); align-items: stretch; }
 	.list--grid .card { grid-template-rows: auto 1fr auto; }
 </style>

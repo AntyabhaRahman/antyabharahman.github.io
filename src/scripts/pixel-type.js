@@ -11,7 +11,7 @@
 const RAMP = 200; // ms for one cell to go from light grey to ink
 const SWEEP = 320; // ms for the sweep to cross the viewport
 const JITTER = 90;
-const FADE = 260; // ms for a lit word to cross over from cells to glyphs
+const FADE = 320; // ms for a lit word to cross over from cells to glyphs
 
 function wrapWords(el) {
 	const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -105,6 +105,33 @@ function measure(span) {
 	};
 }
 
+// Notes use existing SVG paths, sampled on the same sheet as text. Their non-scaling
+// strokes are transformed before stroking so the canvas keeps the browser's stroke width.
+function measureArrow(svg) {
+	if (svg.closest('.panel-body') && getComputedStyle(svg.closest('.panel-body')).opacity === '0') return null;
+	if (svg.getBoundingClientRect().top > innerHeight * 2) return null;
+	const { rect, total } = viewportMatrix(svg);
+	if (!rect.width || !rect.height) return null;
+	const cell = 3;
+	const paths = [...svg.querySelectorAll('path')].map((el) => {
+		const path = new Path2D();
+		path.addPath(new Path2D(el.getAttribute('d')), el.getCTM());
+		return { path, width: parseFloat(getComputedStyle(el).strokeWidth) };
+	});
+	return {
+		graphic: svg, paths, cell, w: Math.ceil(rect.width) + cell * 2, h: Math.ceil(rect.height) + cell * 2,
+		place: total.multiply(new DOMMatrix([1, 0, 0, 1, rect.left - cell, rect.top - cell])),
+		color: getComputedStyle(svg).color,
+	};
+}
+
+// Zero velocity at both ends avoids the abrupt first glyph / last pixel of a square-root fade.
+function crossover(progress) {
+	const p = Math.max(0, Math.min(1, progress));
+	const eased = Math.max(0, Math.min(1, p * p * p * (p * (p * 6 - 15) + 10)));
+	return { up: Math.sqrt(eased), down: Math.sqrt(1 - eased) };
+}
+
 // Packs the measured words onto the sheet in shelves, draws them, reads the sheet back once,
 // and samples each word's cells. A slot starts on a multiple of the word's cell, and each word
 // is clipped to its own box, so a word gets the same cells it had on a canvas of its own.
@@ -120,6 +147,18 @@ function rasterize(items, dpr) {
 		o.textBaseline = 'alphabetic';
 		o.fillStyle = '#000';
 		for (const it of batch) {
+			if (it.graphic) {
+				o.save();
+				o.translate(it.x + it.cell, it.y + it.cell);
+				o.strokeStyle = '#000';
+				o.lineCap = o.lineJoin = 'round';
+				for (const { path, width } of it.paths) {
+					o.lineWidth = width;
+					o.stroke(path);
+				}
+				o.restore();
+				continue;
+			}
 			o.font = it.font;
 			// The context keeps the last word's spacing, and 'normal' is not a canvas value, so it
 			// must be written as zero.
@@ -158,7 +197,7 @@ function rasterize(items, dpr) {
 			// A thin glyph such as = or [ may fill no cell to a third. It still gets its darkest
 			// cell, so it lights up with its neighbours instead of appearing at once.
 			if (!cells.length && best > 0) cells.push(bu, bv);
-			out.push({ span: it.span, place: it.place, cells, cell, color: it.color });
+			out.push({ graphic: it.graphic, span: it.span, place: it.place, cells, cell, color: it.color });
 		}
 		batch = [];
 		x = y = shelf = sheetW = 0;
@@ -224,8 +263,11 @@ function lightUp() {
 	// otherwise light up over an empty sheet.
 	const targets = [...document.querySelectorAll('[data-px]')].filter((t) => getComputedStyle(t).opacity !== '0');
 	if (!targets.length) return html.classList.remove('px-wait');
-	const dpr = Math.min(2, devicePixelRatio || 1);
-	const words = rasterize(targets.flatMap(wrapWords).map(measure).filter(Boolean), dpr);
+	// Sheet sampling indexes bytes, so its scale must be integral even at browser zoom.
+	const dpr = Math.min(2, Math.max(1, Math.ceil(devicePixelRatio || 1)));
+	const items = targets.flatMap(wrapWords).map(measure).filter(Boolean);
+	items.push(...[...document.querySelectorAll('.note svg')].map(measureArrow).filter(Boolean));
+	const words = rasterize(items, dpr);
 	const borders = [...document.querySelectorAll('[data-px-border]')].map((el) => sampleBorder(el, dpr)).filter(Boolean);
 	words.push(...borders);
 	if (!words.length) return html.classList.remove('px-wait');
@@ -241,6 +283,7 @@ function lightUp() {
 			wd.ready = Math.max(wd.ready, wd.delay[k] + RAMP);
 		}
 		if (wd.span) wd.span.style.color = 'transparent';
+		if (wd.graphic) wd.graphic.style.opacity = '0';
 	}
 
 	const canvas = document.createElement('canvas');
@@ -290,13 +333,15 @@ function lightUp() {
 			}
 			// Two layers of the same ink composited over each other cover 1 - f + f² of a stroke,
 			// which pales to 75% at the midpoint. Square roots on both curves lift that to 91%.
-			const up = Math.sqrt(Math.max(0, fade)), down = Math.sqrt(1 - Math.max(0, fade));
+			const { up, down } = crossover(fade);
 			if (fade > 0) {
 				if (wd.span) wd.span.style.color = `color-mix(in srgb, ${wd.color} ${up * 100}%, transparent)`;
+				else if (wd.graphic) wd.graphic.style.opacity = String(up);
 				else wd.el.style.setProperty('--pxb', String(up));
 			}
 			if (fade >= 1) {
 				if (wd.span) wd.span.style.color = '';
+				else if (wd.graphic) wd.graphic.style.opacity = '';
 				else wd.el.style.removeProperty('--pxb');
 				wd.finished = true;
 				continue;
@@ -320,6 +365,7 @@ function lightUp() {
 		canvas.remove();
 		for (const wd of words) {
 			if (wd.span) wd.span.style.color = '';
+			if (wd.graphic) wd.graphic.style.opacity = '';
 			if (wd.el) {
 				wd.el.style.removeProperty('--pxb');
 				wd.canvas.remove();

@@ -9,6 +9,7 @@ for (const resized of [false, true]) {
 	const classes = new Set(['px-wait']);
 	const handlers = new Map();
 	const span = { style: {} };
+	const graphic = { style: {} };
 	let frame;
 	const drawing = { setTransform() {}, clearRect() {}, transform() {}, fillRect() {} };
 	const context = vm.createContext({
@@ -17,26 +18,27 @@ for (const resized of [false, true]) {
 			readyState: 'complete',
 			body: { appendChild() {} },
 			createElement: () => ({ getContext: () => drawing, style: {}, setAttribute() {}, remove() {} }),
-			querySelectorAll: (selector) => selector === '[data-px-border]' ? [] : elements,
+			querySelectorAll: (selector) => selector === '[data-px-border]' || selector === '.note svg' ? [] : elements,
 		},
 		getComputedStyle: () => ({ opacity: '1', getPropertyValue: () => '#000' }),
 		performance: { getEntriesByType: () => [{ type: 'back_forward' }], now: () => 0 },
-		devicePixelRatio: 1, innerWidth: 1000, innerHeight: 800, scrollX: 0, scrollY: 0,
+		devicePixelRatio: 1.1, innerWidth: 1000, innerHeight: 800, scrollX: 0, scrollY: 0,
 		addEventListener: (name, handler) => handlers.set(name, handler),
 		removeEventListener: (name) => handlers.delete(name),
 		requestAnimationFrame: (callback) => { frame = callback; },
-		span,
+		span, graphic,
 	});
 	vm.runInContext(source, context);
 	vm.runInContext(`
 		wrapWords = () => [span];
 		measure = (value) => value;
-		rasterize = () => [{
+		rasterize = (items, scale) => { sampledScale = scale; return [{
 			span, cell: 3, cells: [0, 0], color: '#000',
 			place: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0, transformPoint: () => ({ x: 0, y: 0 }) }
-		}];
+		}, { graphic, cell: 3, cells: [0, 0], color: '#000', place: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0, transformPoint: () => ({ x: 0, y: 0 }) } }]; };
 		lightUp();
 	`, context);
+	assert.equal(context.sampledScale, 2, 'fractional display scale must use integer raster indexes');
 	assert.ok(classes.has('px-live'));
 	assert.deepEqual(elements.map((e) => e.inert), [true, true, true]);
 	if (resized) {
@@ -47,6 +49,22 @@ for (const resized of [false, true]) {
 	assert.equal(classes.has('px-live'), false);
 	assert.deepEqual(elements.map((e) => e.inert), [false, false, true]);
 	assert.equal(span.style.color, '');
+	assert.equal(graphic.style.opacity, '');
 	assert.equal(handlers.has('resize'), false);
 }
 console.log('Entrance locks and restores interaction on completion and resize.');
+
+// The crossover reaches both endpoints gently and keeps a monotone, overlapping handoff.
+const ctx = vm.createContext({document:{createElement:()=>({getContext:()=>({})}),documentElement:{classList:{remove(){}}},readyState:'complete'},performance:{getEntriesByType:()=>[{type:'back_forward'}]}});
+vm.runInContext(source, ctx);
+const curve = p => vm.runInContext(`crossover(${p})`, ctx);
+assert.equal(curve(0).up, 0);
+assert.equal(curve(1).down, 0);
+assert.ok(Number.isFinite(curve(0.99999999).down));
+assert.ok(curve(0.01).up < 0.004);
+assert.ok(curve(0.99).down < 0.004);
+for (let p=0.01; p<=1; p+=0.01) {
+ assert.ok(curve(p).up >= curve(p-0.01).up);
+ assert.ok(curve(p).down <= curve(p-0.01).down);
+}
+console.log('Crossover starts and ends gently, with monotone opacity.');

@@ -1,6 +1,5 @@
 ---
 // Three tall paper panels. A hover or focus widens one panel and reveals its newest items. skiper35 style.
-import Note from './Note.astro';
 interface Item { href: string; title: string; date: Date; }
 interface Panel { href: string; title: string; blurb: string; items: Item[]; count: number; }
 // Ink drawings, one per sheet: a box with a face, a page with a pencil, a flask. Each has a hatch layer for shading.
@@ -18,7 +17,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 ---
 <div class="deck">
 	{panels.map((p, i) => (
-		<article class="panel rough" data-px-border style={`--tilt:${[-0.7, 0.45, -0.35][i]}deg; --n:${p.count}`}>
+		<article class="panel rough" data-px-border style={`--tilt:${[-0.7, 0.45, -0.35][i]}deg`}>
 			<div class="panel-side">
 				<svg class="panel-draw" viewBox="0 0 48 48" aria-hidden="true">
 					<path class="hatch" d={drawings[i].hatch} />
@@ -34,10 +33,9 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 				<div class="panel-stack">
 				<p class="panel-blurb">{p.blurb}</p>
 				<ol class="panel-items">
-					{p.items.map((it, j) => (
+					{p.items.map((it) => (
 						<li>
 							<a class="u" href={it.href}>{it.title}</a>
-							{j === 0 && <Note dir="left">newest</Note>}
 							<span class="hand">{fmt(it.date)}</span>
 						</li>
 					))}
@@ -68,10 +66,9 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 		position: relative; z-index: 1;
 		container-type: size;
 	}
-	/* A sheet is as long as its section: a base for the spine plus 4rem per entry. The hero
-	   caps it, and the field runs on below the shorter sheets. */
+	/* Equal-height sheets fit within the hero; entry counts stay in the printed spec. */
 	.panel {
-		height: min(var(--deck-h, 100cqh), calc(28rem + var(--n, 0) * 4rem));
+		height: min(var(--deck-h, 100cqh), 38rem);
 		flex: 1 1 0; min-width: 5.5rem;
 		background: color-mix(in srgb, var(--paper) 78%, transparent); box-shadow: var(--shadow);
 		display: grid; grid-template-columns: auto 1fr; grid-template-rows: minmax(0, 1fr); overflow: hidden;
@@ -113,7 +110,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 
 	@media (hover: none), (max-width: 900px) {
 		.deck { flex-direction: column; flex: none; height: auto; min-height: 0; container-type: normal; }
-		.panel { flex: none; height: auto; transform: none; grid-template-columns: 1fr; background: var(--paper); }
+		.panel { width: 100%; flex: none; height: auto; transform: none; grid-template-columns: 1fr; background: var(--paper); }
 		.panel:hover, .panel:focus-within { flex: none; transform: none; }
 		.panel-side { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 1.2rem 1.2rem 0; }
 		.panel-draw { grid-column: 2; grid-row: 1; }
