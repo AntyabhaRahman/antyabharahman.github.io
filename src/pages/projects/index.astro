@@ -7,11 +7,11 @@ const projects = (await getCollection('projects')).sort(byDate);
 <Base title="Projects · Antyabha Rahman" description="Projects built by Antyabha Rahman.">
 	<main class="wrap">
 		<h1 class="page-title display" data-px>Projects</h1>
-		<p class="page-lede" data-px>Things I built and why. Active projects are marked.</p>
+		<p class="page-lede" data-px>some code im working on</p>
 		<ol class="list list--grid">
 			{projects.map((p) => (
 				<li class="card rough" data-px data-px-border>
-					<h2><a class="u" href={`/projects/${p.id}/`}>{p.data.title}</a></h2>
+					<h2><a class="u" href={p.data.repo || `/projects/${p.id}/`}>{p.data.title}</a></h2>
 					<p class="muted" style="margin:0">{p.data.description}</p>
 					<div class="meta">
 						<span class="hand">{p.data.status === 'active' ? 'in progress' : p.data.date.getFullYear()}</span>
@@ -27,4 +27,5 @@ const projects = (await getCollection('projects')).sort(byDate);
 <style>
 	.list--grid { grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr)); align-items: stretch; }
 	.list--grid .card { grid-template-rows: auto 1fr auto; }
+	.list--grid h2 { overflow-wrap: anywhere; }
 </style>

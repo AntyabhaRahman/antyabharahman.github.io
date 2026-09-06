@@ -5,10 +5,10 @@ import Base from '../../layouts/Base.astro';
 const posts = (await getCollection('blog')).sort(byDate);
 const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 ---
-<Base title="Blog · Antyabha Rahman" description="Technical notes with the maths left in.">
+<Base title="Blog · Antyabha Rahman" description="thoughts and ideas">
 	<main class="wrap">
 		<h1 class="page-title display" data-px>Blog</h1>
-		<p class="page-lede" data-px>Working notes on machine learning and maths. Equations included.</p>
+		<p class="page-lede" data-px>thoughts and ideas</p>
 		<ol class="list">
 			{posts.map((p) => (
 				<li class="card rough" data-px data-px-border>

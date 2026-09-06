@@ -14,6 +14,7 @@ const d = paper.data;
 	<div slot="meta">
 		<p class="muted" style="margin:0.4rem 0 0">{d.authors.join(', ')}</p>
 		<div class="links">
+			{d.openreview && <a class="u" href={d.openreview}>OpenReview</a>}
 			{d.pdf && <a class="u" href={d.pdf}>PDF</a>}
 			{d.arxiv && <a class="u" href={d.arxiv}>arXiv</a>}
 			{d.code && <a class="u" href={d.code}>Code</a>}

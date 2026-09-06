@@ -24,6 +24,7 @@ export const collections = {
 			date: z.coerce.date(),
 			description: z.string(),
 			pdf: z.string().url().optional(),
+			openreview: z.string().url().optional(),
 			arxiv: z.string().url().optional(),
 			code: z.string().url().optional(),
 		}),

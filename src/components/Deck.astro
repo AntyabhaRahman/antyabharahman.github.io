@@ -103,6 +103,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 	.panel-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
 	.panel-items li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 0.8rem; line-height: 1.35; }
 	.panel-items .hand { font-size: 0.7rem; }
+	.panel-items a { overflow-wrap: anywhere; min-width: 0; }
 	.panel-all { align-self: flex-start; font-size: 0.95rem; }
 
 	@media (hover: none), (max-width: 900px) {

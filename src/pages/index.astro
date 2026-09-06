@@ -11,14 +11,14 @@ const section = async (name: 'projects' | 'blog' | 'research') => {
 	return {
 		href: `/${name}/`,
 		count: all.length,
-		items: all.slice(0, 3).map((e) => ({ href: `/${name}/${e.id}/`, title: e.data.title, date: e.data.date })),
+		items: all.slice(0, 3).map((e) => ({ href: ('repo' in e.data && e.data.repo) || `/${name}/${e.id}/`, title: e.data.title, date: e.data.date })),
 	};
 };
 
 const panels = [
-	{ title: 'Projects', blurb: 'Things I built. Code, tools, and the occasional hardware.', ...(await section('projects')) },
-	{ title: 'Blog', blurb: 'Working notes on machine learning and maths. Equations included.', ...(await section('blog')) },
-	{ title: 'Research', blurb: 'Papers and preprints, with the short version of each.', ...(await section('research')) },
+	{ title: 'Projects', blurb: 'some code im working on', ...(await section('projects')) },
+	{ title: 'Blog', blurb: 'thoughts and ideas', ...(await section('blog')) },
+	{ title: 'Research', blurb: 'cool research stuff', ...(await section('research')) },
 ];
 ---
 <Base title="Antyabha Rahman">

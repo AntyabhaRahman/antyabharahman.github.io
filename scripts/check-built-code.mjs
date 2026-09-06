@@ -1,9 +1,15 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
-const html = readFileSync('dist/blog/why-adam-needs-bias-correction/index.html', 'utf8');
-const code = html.match(/<pre\b[^>]*class="astro-code[^]*?<\/pre>/)?.[0];
-assert.ok(code, 'Adam article must contain its code example');
-assert.ok(code.includes('github-light') && code.includes('--shiki-dark:'),
-	'Code must emit light colors and dark overrides, not pale dark-only text on light paper');
-console.log('Code highlighting includes both themes.');
+let count = 0;
+for (const file of readdirSync('dist', { recursive: true })) {
+	if (!file.endsWith('.html')) continue;
+	const html = readFileSync(join('dist', file), 'utf8');
+	for (const [code] of html.matchAll(/<pre\b[^>]*class="astro-code[^]*?<\/pre>/g)) {
+		assert.ok(code.includes('github-light') && code.includes('--shiki-dark:'),
+			`${file}: code must emit light colors and dark overrides`);
+		count++;
+	}
+}
+console.log(`Verified both highlighting themes on ${count} code blocks.`);

@@ -7,7 +7,7 @@ const papers = (await getCollection('research')).sort(byDate);
 <Base title="Research · Antyabha Rahman" description="Papers and preprints by Antyabha Rahman.">
 	<main class="wrap">
 		<h1 class="page-title display" data-px>Research</h1>
-		<p class="page-lede" data-px>Papers and preprints. Each page has the short version, the equation that matters, and the links.</p>
+		<p class="page-lede" data-px>cool research stuff</p>
 		<ol class="list">
 			{papers.map((p) => (
 				<li class="card rough" data-px data-px-border>
@@ -16,6 +16,7 @@ const papers = (await getCollection('research')).sort(byDate);
 					<p style="margin:0">{p.data.description}</p>
 					<div class="meta">
 						<span class="hand">{p.data.venue}, {p.data.date.getFullYear()}</span>
+						{p.data.openreview && <a class="u" href={p.data.openreview}>OpenReview</a>}
 						{p.data.pdf && <a class="u" href={p.data.pdf}>PDF</a>}
 						{p.data.arxiv && <a class="u" href={p.data.arxiv}>arXiv</a>}
 						{p.data.code && <a class="u" href={p.data.code}>Code</a>}
