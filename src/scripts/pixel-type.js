@@ -4,9 +4,7 @@
 // the canvas while the real text fades in through its color alpha. Nothing is swapped at
 // the end, so the last frame of the crossover is the page itself.
 //
-// Rough borders (data-px-border) get one small canvas each, placed exactly over the border
-// pseudo element and given the same transform and sketch filter. The displacement noise is
-// anchored at the filtered box's origin, so the cells wobble like the border they become.
+// Card borders (data-px-border) use a small canvas aligned with the solid outline.
 
 const RAMP = 160; // ms for one cell to go from light grey to ink
 const SWEEP = 256; // ms for the sweep to cross the viewport
@@ -241,11 +239,10 @@ function rasterize(items, dpr) {
 	return out;
 }
 
-// Cells along the rough outline of a box. The outline is a pseudo element inset 2 px. Its
-// own canvas sits on that exact box so the sketch filter displaces both the same way.
+// Sample cells along the solid outline, matching the pseudo element inset of 2 px.
 function sampleBorder(el, dpr, matrices) {
 	const { rect, total } = matrices.get(el);
-	const cell = 4, inset = 2;
+	const cell = 2.5, inset = 2;
 	const w = Math.round(rect.width) - 2 * inset, h = Math.round(rect.height) - 2 * inset;
 	if (w < cell * 2 || h < cell * 2) return null;
 	const cells = [];
@@ -258,7 +255,7 @@ function sampleBorder(el, dpr, matrices) {
 	const local = new DOMMatrix().translate(-L, -T).multiply(total).translate(L, T);
 	const canvas = document.createElement('canvas');
 	canvas.setAttribute('aria-hidden', 'true');
-	canvas.style.cssText = `position:absolute;left:${L + scrollX}px;top:${T + scrollY}px;width:${w}px;height:${h}px;transform-origin:0 0;transform:${local};z-index:60;pointer-events:none;filter:url(#sketch)`;
+	canvas.style.cssText = `position:absolute;left:${L + scrollX}px;top:${T + scrollY}px;width:${w}px;height:${h}px;transform-origin:0 0;transform:${local};z-index:60;pointer-events:none`;
 	canvas.width = w * dpr;
 	canvas.height = h * dpr;
 	const color = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
@@ -296,7 +293,8 @@ function lightUp() {
 		wd.delay = new Float32Array(wd.cells.length / 2);
 		wd.ready = 0;
 		for (let k = 0; k < wd.delay.length; k++) {
-			const pt = wd.place.transformPoint({ x: wd.cells[2 * k], y: wd.cells[2 * k + 1] });
+			// Treat an outline as one mark, so its far edge does not delay the handoff.
+			const pt = wd.place.transformPoint(wd.border ? { x: 0, y: 0 } : { x: wd.cells[2 * k], y: wd.cells[2 * k + 1] });
 			// The front runs from the top left corner to the bottom right, so no column lights as one line.
 			wd.delay[k] = ((pt.x / innerWidth) * 0.65 + (pt.y / innerHeight) * 0.35) * SWEEP + Math.random() * JITTER;
 			wd.ready = Math.max(wd.ready, wd.delay[k] + RAMP);

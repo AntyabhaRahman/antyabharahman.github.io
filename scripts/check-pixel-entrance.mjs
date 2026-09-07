@@ -80,3 +80,11 @@ console.log('Crossover starts and ends gently, with monotone opacity.');
 
 vm.runInContext('off.width = 100; off.height = 100; rasterize([], 1);', ctx);
 assert.equal(vm.runInContext('off.width * off.height', ctx), 0, 'Release the temporary raster backing store after sampling.');
+
+// A long outline must finish its ramp with nearby text, rather than wait for its far edge.
+const delays = source.slice(source.indexOf('\tfor (const wd of words) {'), source.indexOf('\n\tconst canvas = document.createElement', source.indexOf('\tfor (const wd of words) {')));
+const border = { border: true, cells: [0, 0, 1000, 800], place: { transformPoint: p => p } };
+const timing = vm.createContext({ words: [border], innerWidth: 1000, innerHeight: 800, Float32Array, Math: Object.assign(Object.create(Math), { random: () => 0 }) });
+vm.runInContext(`const SWEEP = 256, JITTER = 72, RAMP = 160; ${delays}`, timing);
+assert.equal(border.delay[0], border.delay[1], 'Border extent must not delay its crossover.');
+assert.equal(border.ready, 160);
