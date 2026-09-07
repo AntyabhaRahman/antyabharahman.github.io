@@ -75,6 +75,10 @@ assert.ok(curve(0.99).down < 0.004);
 for (let p=0.01; p<=1; p+=0.01) {
  assert.ok(curve(p).up >= curve(p-0.01).up);
  assert.ok(curve(p).down <= curve(p-0.01).down);
+ // Alpha layers composite rather than add. This guards their shared stroke area,
+ // not the perceived brightness of the different pixel and glyph shapes.
+ const { up, down } = curve(p);
+ assert.ok(up + down - up * down >= 0.85, 'Overlapping ink must not dip into a pale midpoint.');
 }
 console.log('Crossover starts and ends gently, with monotone opacity.');
 

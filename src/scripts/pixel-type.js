@@ -9,7 +9,7 @@
 const RAMP = 160; // ms for one cell to go from light grey to ink
 const SWEEP = 256; // ms for the sweep to cross the viewport
 const JITTER = 72;
-const FADE = 256; // ms for a lit word to cross over from cells to glyphs
+const FADE = 200; // ms for a lit word to cross over from cells to glyphs
 
 function wrapWords(el) {
 	const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -134,11 +134,12 @@ function measureArrow(svg, matrices) {
 	};
 }
 
-// Zero velocity at both ends avoids the abrupt first glyph / last pixel of a square-root fade.
+// Spread the handoff through the interval and fill glyphs before retiring their cells.
+// Both layers start and finish at zero velocity; overlapping ink stays above 85% opacity.
 function crossover(progress) {
 	const p = Math.max(0, Math.min(1, progress));
-	const eased = Math.max(0, Math.min(1, p * p * p * (p * (p * 6 - 15) + 10)));
-	return { up: Math.sqrt(eased), down: Math.sqrt(1 - eased) };
+	const eased = p * p * (3 - 2 * p);
+	return { up: eased * (2 - eased), down: 1 - eased };
 }
 
 // Packs the measured words onto the sheet in shelves, draws them, reads the sheet back once,
@@ -350,8 +351,7 @@ function lightUp() {
 				ctx.setTransform(dpr, 0, 0, dpr, dx, dy);
 				ctx.transform(a, b, c, d, e, f);
 			}
-			// Two layers of the same ink composited over each other cover 1 - f + f² of a stroke,
-			// which pales to 75% at the midpoint. Square roots on both curves lift that to 91%.
+			// Ease both layers through the handoff without an abrupt first glyph or last pixel.
 			const { up, down } = crossover(fade);
 			if (fade > 0) {
 				if (wd.span) wd.span.style.color = `color-mix(in srgb, ${wd.color} ${up * 100}%, transparent)`;
