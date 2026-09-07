@@ -11,10 +11,11 @@ for (const resized of [false, true]) {
 	const span = { style: {} };
 	const graphic = { style: {} };
 	let frame;
+	let scrollReads = 0;
 	const drawing = { setTransform() {}, clearRect() {}, transform() {}, fillRect() {} };
 	const context = vm.createContext({
 		document: {
-			documentElement: { classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c) } },
+			documentElement: { classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c), contains: (c) => classes.has(c) } },
 			readyState: 'complete',
 			body: { appendChild() {} },
 			createElement: () => ({ getContext: () => drawing, style: {}, setAttribute() {}, remove() {} }),
@@ -28,9 +29,12 @@ for (const resized of [false, true]) {
 		requestAnimationFrame: (callback) => { frame = callback; },
 		span, graphic,
 	});
+	Object.defineProperty(context, 'scrollX', { get() { scrollReads++; return 0; } });
 	vm.runInContext(source, context);
+	classes.add('px-wait');
 	vm.runInContext(`
 		wrapWords = () => [span];
+		viewportMatrices = () => new Map();
 		measure = (value) => value;
 		rasterize = (items, scale) => { sampledScale = scale; return [{
 			span, cell: 3, cells: [0, 0], color: '#000',
@@ -40,6 +44,9 @@ for (const resized of [false, true]) {
 	`, context);
 	assert.equal(context.sampledScale, 2, 'fractional display scale must use integer raster indexes');
 	assert.ok(classes.has('px-live'));
+	scrollReads = 0;
+	frame(200);
+	assert.ok(scrollReads <= 1, 'Read scroll position once per frame, before text style writes.');
 	assert.deepEqual(elements.map((e) => e.inert), [true, true, true]);
 	if (resized) {
 		context.innerWidth = 500;
@@ -51,6 +58,8 @@ for (const resized of [false, true]) {
 	assert.equal(span.style.color, '');
 	assert.equal(graphic.style.opacity, '');
 	assert.equal(handlers.has('resize'), false);
+	vm.runInContext('lightUp()', context);
+	assert.equal(classes.has('px-live'), false, 'Never restart the entrance after text is already revealed.');
 }
 console.log('Entrance locks and restores interaction on completion and resize.');
 
@@ -68,3 +77,6 @@ for (let p=0.01; p<=1; p+=0.01) {
  assert.ok(curve(p).down <= curve(p-0.01).down);
 }
 console.log('Crossover starts and ends gently, with monotone opacity.');
+
+vm.runInContext('off.width = 100; off.height = 100; rasterize([], 1);', ctx);
+assert.equal(vm.runInContext('off.width * off.height', ctx), 0, 'Release the temporary raster backing store after sampling.');

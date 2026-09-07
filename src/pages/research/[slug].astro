@@ -1,6 +1,5 @@
 ---
-// KaTeX first, so the global sheet that follows it wins on .katex-display.
-import 'katex/dist/katex.min.css';
+import katexStyles from 'katex/dist/katex.min.css?url';
 import { getCollection, render } from 'astro:content';
 import Article from '../../layouts/Article.astro';
 export async function getStaticPaths() {
@@ -8,9 +7,11 @@ export async function getStaticPaths() {
 }
 const { paper } = Astro.props;
 const { Content } = await render(paper);
+const hasMath = paper.rendered?.html.includes('class="katex') ?? false;
 const d = paper.data;
 ---
 <Article title={d.title} description={d.description} kicker={`${d.venue}, ${d.date.getFullYear()}`} backHref="/research/" backLabel="all papers">
+	<Fragment slot="head">{hasMath && <link rel="stylesheet" href={katexStyles} />}</Fragment>
 	<div slot="meta">
 		<p class="muted" style="margin:0.4rem 0 0">{d.authors.join(', ')}</p>
 		<div class="links">

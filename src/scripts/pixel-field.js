@@ -53,6 +53,7 @@ export function mountPixelField(canvas, options) {
 
 	let cols = 0, rows = 0, cssW = 0, cssH = 0;
 	let energy = new Float32Array(0);
+	let columnWarp = new Float64Array(0);
 	let band = new Uint8Array(0);
 	let visit = new Float32Array(0); // last time the optimizer crossed a cell
 	let order = new Int32Array(0); // cell indices grouped by shade, rebuilt on a full paint
@@ -111,6 +112,7 @@ export function mountPixelField(canvas, options) {
 		canvas.width = w;
 		canvas.height = h;
 		cols = Math.ceil(w / PITCH);
+		if (columnWarp.length !== cols) columnWarp = new Float64Array(cols);
 		rows = Math.ceil(h / PITCH);
 		const n = cols * rows;
 		if (energy.length !== n) {
@@ -212,11 +214,9 @@ export function mountPixelField(canvas, options) {
 		return energy[yi * cols + xi];
 	}
 	// Terrain height in [0, 1] at a cell position, plus the pointer hill.
-	function height(x, y) {
-		// Every wave completes a whole number of cycles per LOOP, so the field repeats with no seam.
-		const ph = ((time % LOOP) / LOOP) * Math.PI * 2;
-		const wx = x + 2.6 * Math.sin(y * 0.105 + ph + 0.7);
-		const wy = y + 2.6 * Math.cos(x * 0.088 - ph + 2.1);
+	function height(x, y, ph = ((time % LOOP) / LOOP) * Math.PI * 2,
+		wx = x + 2.6 * Math.sin(y * 0.105 + ph + 0.7),
+		wy = y + 2.6 * Math.cos(x * 0.088 - ph + 2.1)) {
 		const s3 = Math.sin(wx * 0.074 + ph) + Math.sin(wy * 0.059 - ph + 1.3) + Math.sin((wx + wy) * 0.041 + 2 * ph + 0.4);
 		// A steep rim at the canvas edges keeps the ball inside. The interior stays flat.
 		const bx = (x - cols / 2) / (cols / 2), by = (y - rows / 2) / (rows / 2);
@@ -288,11 +288,15 @@ export function mountPixelField(canvas, options) {
 			}
 			return;
 		}
+		// Warping repeats down each column and across each row; compute it once per axis.
+		const ph = ((time % LOOP) / LOOP) * Math.PI * 2;
+		for (let x = 0; x < cols; x++) columnWarp[x] = 2.6 * Math.cos(x * 0.088 - ph + 2.1);
 		for (let y = 0; y < rows; y++) {
 			const row = y * cols;
+			const rowWarp = 2.6 * Math.sin(y * 0.105 + ph + 0.7);
 			for (let x = 0; x < cols; x++) {
 				const i = row + x;
-				const h = height(x, y);
+				const h = height(x, y, ph, x + rowWarp, y + columnWarp[x]);
 				// Low ground is dark. High ground above the last cut is bare paper.
 				let b = h < CUTS[0] ? 4 : h < CUTS[1] ? 3 : h < CUTS[2] ? 2 : h < CUTS[3] ? 1 : 0;
 				const e = energy[i];

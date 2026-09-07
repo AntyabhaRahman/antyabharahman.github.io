@@ -6,6 +6,8 @@ let count = 0;
 for (const file of readdirSync('dist', { recursive: true })) {
 	if (!file.endsWith('.html')) continue;
 	const html = readFileSync(join('dist', file), 'utf8');
+	assert.equal(/<link[^>]*href="[^"]*katex[^"]*\.css"/.test(html), html.includes('class="katex'),
+		`${file}: load maths CSS exactly when rendered equations need it`);
 	for (const [code] of html.matchAll(/<pre\b[^>]*class="astro-code[^]*?<\/pre>/g)) {
 		assert.ok(code.includes('github-light') && code.includes('--shiki-dark:'),
 			`${file}: code must emit light colors and dark overrides`);

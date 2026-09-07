@@ -1,6 +1,5 @@
 ---
-// KaTeX first, so the global sheet that follows it wins on .katex-display.
-import 'katex/dist/katex.min.css';
+import katexStyles from 'katex/dist/katex.min.css?url';
 import { getCollection, render } from 'astro:content';
 import Article from '../../layouts/Article.astro';
 import Note from '../../components/Note.astro';
@@ -15,11 +14,12 @@ export async function getStaticPaths() {
 }
 const { post } = Astro.props;
 const { Content } = await render(post);
-const mathFonts = /\$/.test(post.body ?? '') ? [katexMain, katexAms, katexMath, katexSize1, katexSize2] : [];
+const hasMath = post.rendered?.html.includes('class="katex') ?? false;
+const mathFonts = hasMath ? [katexMain, katexAms, katexMath, katexSize1, katexSize2] : [];
 const fmt = post.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
 <Article title={post.data.title} description={post.data.description} kicker={fmt} backHref="/blog/" backLabel="all posts">
-	<Fragment slot="head">{mathFonts.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}</Fragment>
+	<Fragment slot="head">{hasMath && <link rel="stylesheet" href={katexStyles} />}{mathFonts.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}</Fragment>
 	<div class="meta" slot="meta">
 		{post.data.tags.map((t) => <span class="tag"><span class="tag-hash">#</span>{t}</span>)}
 	</div>

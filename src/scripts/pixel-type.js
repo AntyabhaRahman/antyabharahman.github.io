@@ -41,31 +41,42 @@ function wrapWords(el) {
 	return words;
 }
 
-// The matrix that carries a point from the element's untransformed layout position to the
-// viewport. Ancestor transforms are switched off for one synchronous measurement, so the
-// page never paints without them.
-function viewportMatrix(el) {
-	const chain = [];
-	for (let e = el; e && e !== document.documentElement; e = e.parentElement) {
-		const m = getComputedStyle(e).transform;
-		if (m !== 'none') chain.push({ e, m: new DOMMatrix(m), transform: e.style.transform, transition: e.style.transition });
+// Measure all words with ancestor transforms disabled in one synchronous pass. Restore
+// transforms before paint, then reuse the matrices instead of relaying out each word.
+function viewportMatrices(elements) {
+	const transforms = new Map();
+	const seen = new Set();
+	const tops = new Map(elements.map((el) => [el, el.getBoundingClientRect().top]));
+	for (const el of elements) {
+		for (let e = el; e && e !== document.documentElement && !seen.has(e); e = e.parentElement) {
+			seen.add(e);
+			const m = getComputedStyle(e).transform;
+			if (m !== 'none') transforms.set(e, { m: new DOMMatrix(m), transform: e.style.transform, transition: e.style.transition });
+		}
 	}
-	for (const c of chain) {
-		c.e.style.transition = 'none';
-		c.e.style.transform = 'none';
+	try {
+		for (const [e] of transforms) {
+			e.style.transition = 'none';
+			e.style.transform = 'none';
+		}
+		for (const [e, c] of transforms) {
+			const r = e.getBoundingClientRect();
+			const [ox, oy] = getComputedStyle(e).transformOrigin.split(' ').map(parseFloat);
+			c.about = new DOMMatrix().translate(r.left + ox, r.top + oy).multiply(c.m).translate(-(r.left + ox), -(r.top + oy));
+		}
+		return new Map(elements.map((el) => {
+			let total = new DOMMatrix();
+			for (let e = el; e && e !== document.documentElement; e = e.parentElement) {
+				const c = transforms.get(e);
+				if (c) total = c.about.multiply(total);
+			}
+			return [el, { rect: el.getBoundingClientRect(), total, top: tops.get(el) }];
+		}));
+	} finally {
+		for (const [e, c] of transforms) e.style.transform = c.transform;
+		for (const [e] of transforms) void getComputedStyle(e).transform;
+		for (const [e, c] of transforms) e.style.transition = c.transition;
 	}
-	const rect = el.getBoundingClientRect();
-	let total = new DOMMatrix();
-	for (const c of chain) {
-		const r = c.e.getBoundingClientRect();
-		const [ox, oy] = getComputedStyle(c.e).transformOrigin.split(' ').map(parseFloat);
-		const about = new DOMMatrix().translate(r.left + ox, r.top + oy).multiply(c.m).translate(-(r.left + ox), -(r.top + oy));
-		total = about.multiply(total);
-	}
-	for (const c of chain) c.e.style.transform = c.transform;
-	for (const c of chain) void getComputedStyle(c.e).transform; // flush before transitions return
-	for (const c of chain) c.e.style.transition = c.transition;
-	return { rect, total };
 }
 
 // One offscreen sheet serves every word. The words are packed onto it and read back once. A
@@ -78,10 +89,10 @@ const SHEET_MAX = 8192; // device px, a safe canvas height everywhere
 // Measures one word: its cell size, its box on the sheet, and the placement that maps sheet
 // (u, v) to viewport (x, y). Words far below the fold cannot scroll into view before the
 // light-up ends. They stay plain text, which keeps the pass short on long articles.
-function measure(span) {
-	if (span.getBoundingClientRect().top > innerHeight * 2) return null;
+function measure(span, matrices) {
+	const { rect, total, top } = matrices.get(span);
+	if (top > innerHeight * 2) return null;
 	const cs = getComputedStyle(span);
-	const { rect, total } = viewportMatrix(span);
 	if (rect.width < 2 || rect.height < 2) return null;
 	const size = parseFloat(cs.fontSize);
 	const cell = Math.max(3, Math.round(size / 10));
@@ -107,10 +118,10 @@ function measure(span) {
 
 // Notes use existing SVG paths, sampled on the same sheet as text. Their non-scaling
 // strokes are transformed before stroking so the canvas keeps the browser's stroke width.
-function measureArrow(svg) {
+function measureArrow(svg, matrices) {
 	if (svg.closest('.panel-body') && getComputedStyle(svg.closest('.panel-body')).opacity === '0') return null;
-	if (svg.getBoundingClientRect().top > innerHeight * 2) return null;
-	const { rect, total } = viewportMatrix(svg);
+	const { rect, total, top } = matrices.get(svg);
+	if (top > innerHeight * 2) return null;
 	if (!rect.width || !rect.height) return null;
 	const cell = 3;
 	const paths = [...svg.querySelectorAll('path')].map((el) => {
@@ -225,13 +236,15 @@ function rasterize(items, dpr) {
 		batch.push(it);
 	}
 	flush();
+	// Sampling is complete; the animation only needs cell coordinates.
+	off.width = off.height = 0;
 	return out;
 }
 
 // Cells along the rough outline of a box. The outline is a pseudo element inset 2 px. Its
 // own canvas sits on that exact box so the sketch filter displaces both the same way.
-function sampleBorder(el, dpr) {
-	const { rect, total } = viewportMatrix(el);
+function sampleBorder(el, dpr, matrices) {
+	const { rect, total } = matrices.get(el);
 	const cell = 4, inset = 2;
 	const w = Math.round(rect.width) - 2 * inset, h = Math.round(rect.height) - 2 * inset;
 	if (w < cell * 2 || h < cell * 2) return null;
@@ -255,6 +268,8 @@ function sampleBorder(el, dpr) {
 
 function lightUp() {
 	const html = document.documentElement;
+	// Slow fonts may finish after the fallback has already revealed the page.
+	if (!html.classList.contains('px-wait')) return;
 	// px-wait stays on through the sampling pass. Layout and canvas drawing do not need the text
 	// to be visible, and the marks that fade in at the end must never see a frame without a class.
 	// The site runs its motion regardless of the Reduce Motion setting. The owner chose this on
@@ -265,10 +280,14 @@ function lightUp() {
 	if (!targets.length) return html.classList.remove('px-wait');
 	// Sheet sampling indexes bytes, so its scale must be integral even at browser zoom.
 	const dpr = Math.min(2, Math.max(1, Math.ceil(devicePixelRatio || 1)));
-	const items = targets.flatMap(wrapWords).map(measure).filter(Boolean);
-	items.push(...[...document.querySelectorAll('.note svg')].map(measureArrow).filter(Boolean));
+	const spans = targets.flatMap(wrapWords);
+	const arrows = [...document.querySelectorAll('.note svg')];
+	const borderElements = [...document.querySelectorAll('[data-px-border]')];
+	const matrices = viewportMatrices([...spans, ...arrows, ...borderElements]);
+	const items = spans.map((span) => measure(span, matrices)).filter(Boolean);
+	items.push(...arrows.map((svg) => measureArrow(svg, matrices)).filter(Boolean));
 	const words = rasterize(items, dpr);
-	const borders = [...document.querySelectorAll('[data-px-border]')].map((el) => sampleBorder(el, dpr)).filter(Boolean);
+	const borders = borderElements.map((el) => sampleBorder(el, dpr, matrices)).filter(Boolean);
 	words.push(...borders);
 	if (!words.length) return html.classList.remove('px-wait');
 	const root = getComputedStyle(document.documentElement);
@@ -317,6 +336,8 @@ function lightUp() {
 		const t = now - t0;
 		ctxText.setTransform(dpr, 0, 0, dpr, 0, 0);
 		ctxText.clearRect(0, 0, innerWidth, innerHeight);
+		// Read layout before writing word colors, avoiding a style flush for every word.
+		const dx = (sx0 - scrollX) * dpr, dy = (sy0 - scrollY) * dpr;
 		let done = true;
 		for (const wd of words) {
 			if (wd.finished) continue;
@@ -328,7 +349,7 @@ function lightUp() {
 				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 			} else {
 				const { a, b, c, d, e, f } = wd.place;
-				ctx.setTransform(dpr, 0, 0, dpr, (sx0 - scrollX) * dpr, (sy0 - scrollY) * dpr);
+				ctx.setTransform(dpr, 0, 0, dpr, dx, dy);
 				ctx.transform(a, b, c, d, e, f);
 			}
 			// Two layers of the same ink composited over each other cover 1 - f + f² of a stroke,

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { isContourDot, mountPixelField, spawnPoint } from '../src/scripts/pixel-field.js';
 
 assert.deepEqual(spawnPoint(100, 50, 1), [88, 6]);
@@ -12,9 +13,10 @@ assert.equal(isContourDot(new Uint8Array([1, 1, 1, 1]), 2, 0, hash), false);
 const fills = [];
 const paintedColors = new Set();
 let fillColor;
+let signature;
 const context = {
-	clearRect() {},
-	fillRect(...args) { fills.push(args); paintedColors.add(fillColor); },
+	clearRect(...args) { signature?.update(JSON.stringify(['clear', ...args])); },
+	fillRect(...args) { fills.push(args); paintedColors.add(fillColor); signature?.update(JSON.stringify([fillColor, ...args])); },
 	setTransform() {},
 	set fillStyle(value) { fillColor = value; },
 	set globalAlpha(value) {},
@@ -102,3 +104,15 @@ trail.destroy();
 assert.equal(documentHandlers.has('selectionchange'), false, 'Destroy removes the selection listener.');
 assert.equal(pointerHandlers.has('click'), false, 'Destroy removes click listener.');
 assert.equal(pointerHandlers.has('pointerdown'), false, 'Destroy removes pointerdown listener.');
+
+// Lock the visible terrain/optimizer output while changing its calculation strategy.
+signature = createHash('sha256');
+clock = 0;
+const rendering = mountPixelField(canvas, { mode: 'ambient' });
+for (let i = 1; i <= 150; i++) {
+	clock = i * 34;
+	if (i === 40) pointerHandlers.get('pointermove')({ pointerType: 'mouse', clientX: 450, clientY: 220 });
+	nextFrame(clock);
+}
+assert.equal(signature.digest('hex'), '8bd8673699b02dadf31c986f76d0d4c376e84077351c1331efd93c6641528cda', 'Terrain, pointer and optimizer drawings must preserve the original output.');
+rendering.destroy();
