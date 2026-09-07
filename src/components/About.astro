@@ -39,8 +39,10 @@ const { city = '[CITY]', email, cv } = Astro.props;
 		.about-text { display: contents; }
 		.about-draw { width: 4rem; height: 4rem; }
 		.about h1 { font-size: 1.625rem; }
-		.about-role { gap: 0.6rem; }
+		.about-name { gap: 0.75rem; }
+		.about-role { gap: 0.25rem 0.6rem; }
 		.about-copy, .about-links { grid-column: 1 / -1; }
+		.about-links { row-gap: 0.6rem; margin-top: 0.6rem; }
 		.about-links a { display: inline-flex; align-items: center; min-height: 44px; padding-block: 0.6rem; margin-block: -0.6rem; }
 	}
 </style>
