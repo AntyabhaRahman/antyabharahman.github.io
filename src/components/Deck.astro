@@ -118,4 +118,11 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short', year: '
 		.panel-spec > div { gap: 0.25rem; }
 		.panel-body { opacity: 1; transform: none; padding: 1rem 1.2rem 1.4rem; min-width: 0; }
 	}
+	@media (max-width: 640px) {
+		.deck { gap: 1.75rem; }
+		.panel-side { padding: 1rem 1rem 0; }
+		.panel-draw { width: 2.5rem; height: 2.5rem; }
+		.panel-body { padding: 0.75rem 1rem 1rem; }
+		.panel-stack { gap: 0.75rem; }
+	}
 </style>
