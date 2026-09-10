@@ -1,0 +1,258 @@
+[
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/",
+    "skipTarget": "#main",
+    "viewport": 320
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/projects/",
+    "skipTarget": "#main",
+    "viewport": 320
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/blog/",
+    "skipTarget": "#main",
+    "viewport": 320
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/research/",
+    "skipTarget": "#main",
+    "viewport": 320
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/projects/mnist_d_transformers/",
+    "skipTarget": "#main",
+    "viewport": 320
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/projects/pyspark_similarity_join/",
+    "skipTarget": "#main",
+    "viewport": 320
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "skipTarget": "#main",
+    "viewport": 320
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/404.html",
+    "skipTarget": "#main",
+    "viewport": 320
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/",
+    "skipTarget": "#main",
+    "viewport": 400
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/projects/",
+    "skipTarget": "#main",
+    "viewport": 400
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/blog/",
+    "skipTarget": "#main",
+    "viewport": 400
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/research/",
+    "skipTarget": "#main",
+    "viewport": 400
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/projects/mnist_d_transformers/",
+    "skipTarget": "#main",
+    "viewport": 400
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/projects/pyspark_similarity_join/",
+    "skipTarget": "#main",
+    "viewport": 400
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "skipTarget": "#main",
+    "viewport": 400
+  },
+  {
+    "mainCount": 1,
+    "nav": "14.4px",
+    "overflow": false,
+    "path": "/404.html",
+    "skipTarget": "#main",
+    "viewport": 400
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/",
+    "skipTarget": "#main",
+    "viewport": 800
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/projects/",
+    "skipTarget": "#main",
+    "viewport": 800
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/blog/",
+    "skipTarget": "#main",
+    "viewport": 800
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/research/",
+    "skipTarget": "#main",
+    "viewport": 800
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/projects/mnist_d_transformers/",
+    "skipTarget": "#main",
+    "viewport": 800
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/projects/pyspark_similarity_join/",
+    "skipTarget": "#main",
+    "viewport": 800
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "skipTarget": "#main",
+    "viewport": 800
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/404.html",
+    "skipTarget": "#main",
+    "viewport": 800
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/",
+    "skipTarget": "#main",
+    "viewport": 1309
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/projects/",
+    "skipTarget": "#main",
+    "viewport": 1309
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/blog/",
+    "skipTarget": "#main",
+    "viewport": 1309
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/research/",
+    "skipTarget": "#main",
+    "viewport": 1309
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/projects/mnist_d_transformers/",
+    "skipTarget": "#main",
+    "viewport": 1309
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/projects/pyspark_similarity_join/",
+    "skipTarget": "#main",
+    "viewport": 1309
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "skipTarget": "#main",
+    "viewport": 1309
+  },
+  {
+    "mainCount": 1,
+    "nav": "12.48px",
+    "overflow": false,
+    "path": "/404.html",
+    "skipTarget": "#main",
+    "viewport": 1309
+  }
+]

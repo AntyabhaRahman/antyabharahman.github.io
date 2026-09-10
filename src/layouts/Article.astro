@@ -9,7 +9,7 @@ const { title, description, kicker, backHref, backLabel } = Astro.props;
 <Base title={`${title} · Antyabha Rahman`} description={description}>
 	<slot name="head" slot="head" />
 	<div class="pf-fixed"><PixelCanvas mode="trail" /></div>
-	<main class="article wrap" data-px>
+	<main id="main" class="article wrap" tabindex="-1" data-px>
 		<header>
 			<div class="article-rail">
 				<Note dir="left"><a class="u" href={backHref}>{backLabel}</a></Note>

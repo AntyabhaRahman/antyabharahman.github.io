@@ -45,6 +45,7 @@ export function isContourDot(bands, cols, i, hash) {
 
 export function mountPixelField(canvas, options) {
 	const trail = options?.mode === 'trail';
+	const motion = matchMedia('(prefers-reduced-motion: reduce)');
 	const ctx = canvas.getContext('2d');
 	if (!ctx) return { destroy() {} };
 	const parent = canvas.parentElement || canvas;
@@ -168,7 +169,7 @@ export function mountPixelField(canvas, options) {
 	function onClick(ev) {
 		const clearedSelection = selectionClick && document.getSelection()?.isCollapsed === true;
 		selectionClick = false;
-		if (!clearedSelection || !cols) return;
+		if (motion.matches || !clearedSelection || !cols) return;
 		onSelectionChange();
 		const box = canvas.getBoundingClientRect();
 		const cx = (ev.clientX - box.left) / PITCH, cy = (ev.clientY - box.top) / PITCH;
@@ -182,7 +183,7 @@ export function mountPixelField(canvas, options) {
 	}
 
 	function onPointerMove(ev) {
-		if (ev.pointerType === 'touch' || cols === 0) return;
+		if (motion.matches || ev.pointerType === 'touch' || cols === 0) return;
 		if (selecting) return;
 		const box = canvas.getBoundingClientRect();
 		const cx = (ev.clientX - box.left) / PITCH;
@@ -512,7 +513,7 @@ export function mountPixelField(canvas, options) {
 	}
 
 	function start() {
-		if (frameId || !onScreen || cols === 0) return;
+		if (motion.matches || frameId || !onScreen || cols === 0) return;
 		if (trail && !live && !wave && !pendingPulse) return;
 		last = performance.now();
 		frameId = requestAnimationFrame(frame);
@@ -528,7 +529,8 @@ export function mountPixelField(canvas, options) {
 		paperOld = paper;
 		readColors();
 		const d = ev && ev.detail;
-		if (d && cols && typeof d.x === 'number') {
+		wave = null;
+		if (!motion.matches && d && cols && typeof d.x === 'number') {
 			const box = canvas.getBoundingClientRect();
 			// The CSS wipe ends at circle(150%), a radius of 1.5 times the viewport diagonal over root 2.
 			wave = { ox: d.x - box.left, oy: d.y - box.top, t0: performance.now(), rmax: 1.5 * Math.hypot(innerWidth, innerHeight) / Math.SQRT2 };
@@ -539,6 +541,18 @@ export function mountPixelField(canvas, options) {
 		else redraw();
 	}
 
+	function onMotion() {
+		if (!motion.matches) return start();
+		stop();
+		wave = pendingPulse = null;
+		energy.fill(0);
+		live = hasPrev = false;
+		clickPulse = 0;
+		full = true;
+		redraw();
+	}
+
+	motion.addEventListener('change', onMotion);
 	readColors();
 	const sizeWatch = new ResizeObserver(resize);
 	sizeWatch.observe(parent);
@@ -559,6 +573,7 @@ export function mountPixelField(canvas, options) {
 	return {
 		destroy() {
 			stop();
+			motion.removeEventListener('change', onMotion);
 			sizeWatch.disconnect();
 			viewWatch.disconnect();
 			window.removeEventListener('pointermove', onPointerMove);

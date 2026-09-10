@@ -1,0 +1,114 @@
+[
+  {
+    "documentWidth": 1295,
+    "headings": [
+      {
+        "scroll": 682,
+        "text": "Antyabha Rahman",
+        "width": 682
+      }
+    ],
+    "hidden": "px-live",
+    "mainCount": 0,
+    "path": "/",
+    "viewport": 1309
+  },
+  {
+    "documentWidth": 1295,
+    "headings": [
+      {
+        "scroll": 1152,
+        "text": "Projects",
+        "width": 1152
+      }
+    ],
+    "hidden": "px-live",
+    "mainCount": 1,
+    "path": "/projects/",
+    "viewport": 1309
+  },
+  {
+    "documentWidth": 1295,
+    "headings": [
+      {
+        "scroll": 1152,
+        "text": "Blog",
+        "width": 1152
+      }
+    ],
+    "hidden": "px-live",
+    "mainCount": 1,
+    "path": "/blog/",
+    "viewport": 1309
+  },
+  {
+    "documentWidth": 1295,
+    "headings": [
+      {
+        "scroll": 1152,
+        "text": "Research",
+        "width": 1152
+      }
+    ],
+    "hidden": "px-live",
+    "mainCount": 1,
+    "path": "/research/",
+    "viewport": 1309
+  },
+  {
+    "documentWidth": 1295,
+    "headings": [
+      {
+        "scroll": 673,
+        "text": "MNIST-1D Decoder-Only Transformer classifier",
+        "width": 673
+      }
+    ],
+    "hidden": "px-live",
+    "mainCount": 1,
+    "path": "/projects/mnist_d_transformers/",
+    "viewport": 1309
+  },
+  {
+    "documentWidth": 1295,
+    "headings": [
+      {
+        "scroll": 673,
+        "text": "Spatial-Textual Similarity Join with PySpark",
+        "width": 673
+      }
+    ],
+    "hidden": "px-live",
+    "mainCount": 1,
+    "path": "/projects/pyspark_similarity_join/",
+    "viewport": 1309
+  },
+  {
+    "documentWidth": 1295,
+    "headings": [
+      {
+        "scroll": 673,
+        "text": "Probing the Origins of Reasoning Performance: Representational Quality for Mathematical Problem-Solving in RL vs SFT Finetuned Models",
+        "width": 673
+      }
+    ],
+    "hidden": "px-live",
+    "mainCount": 1,
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "viewport": 1309
+  },
+  {
+    "documentWidth": 1295,
+    "headings": [
+      {
+        "scroll": 1152,
+        "text": "Not found",
+        "width": 1152
+      }
+    ],
+    "hidden": "px-live",
+    "mainCount": 1,
+    "path": "/404.html",
+    "viewport": 1309
+  }
+]

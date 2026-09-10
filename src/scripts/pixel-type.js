@@ -268,10 +268,10 @@ function lightUp() {
 	const html = document.documentElement;
 	// Slow fonts may finish after the fallback has already revealed the page.
 	if (!html.classList.contains('px-wait')) return;
+	const motion = matchMedia('(prefers-reduced-motion: reduce)');
+	if (motion.matches) return html.classList.remove('px-wait');
 	// px-wait stays on through the sampling pass. Layout and canvas drawing do not need the text
 	// to be visible, and the marks that fade in at the end must never see a frame without a class.
-	// The site runs its motion regardless of the Reduce Motion setting. The owner chose this on
-	// 2026-09-05 so every browser shows the same page.
 	// A hidden host, such as a deck body at rest on desktop, gets no cells. Its text would
 	// otherwise light up over an empty sheet.
 	const targets = [...document.querySelectorAll('[data-px]')].filter((t) => getComputedStyle(t).opacity !== '0');
@@ -376,7 +376,7 @@ function lightUp() {
 			}
 			ctx.globalAlpha = 1;
 		}
-		if (!done && t < 6000 && !resized) {
+		if (!done && t < 6000 && !resized && !motion.matches) {
 			requestAnimationFrame(frame);
 			return;
 		}

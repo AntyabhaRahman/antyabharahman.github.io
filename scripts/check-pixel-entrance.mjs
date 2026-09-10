@@ -4,7 +4,8 @@ import vm from 'node:vm';
 
 // Run the real entrance lifecycle with drawing stubbed out; no browser dependency.
 const source = readFileSync(new URL('../src/scripts/pixel-type.js', import.meta.url), 'utf8');
-for (const resized of [false, true]) {
+for (const finish of ['complete', 'resize', 'reduced']) {
+	const motion = { matches: false };
 	const elements = [{ inert: false }, { inert: false }, { inert: true }];
 	const classes = new Set(['px-wait']);
 	const handlers = new Map();
@@ -14,6 +15,7 @@ for (const resized of [false, true]) {
 	let scrollReads = 0;
 	const drawing = { setTransform() {}, clearRect() {}, transform() {}, fillRect() {} };
 	const context = vm.createContext({
+		matchMedia: () => motion,
 		document: {
 			documentElement: { classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c), contains: (c) => classes.has(c) } },
 			readyState: 'complete',
@@ -48,11 +50,12 @@ for (const resized of [false, true]) {
 	frame(200);
 	assert.ok(scrollReads <= 1, 'Read scroll position once per frame, before text style writes.');
 	assert.deepEqual(elements.map((e) => e.inert), [true, true, true]);
-	if (resized) {
+	if (finish === 'resize') {
 		context.innerWidth = 500;
 		handlers.get('resize')();
 	}
-	frame(resized ? 10 : 7000);
+	if (finish === 'reduced') motion.matches = true;
+	frame(finish === 'complete' ? 7000 : 210);
 	assert.equal(classes.has('px-live'), false);
 	assert.deepEqual(elements.map((e) => e.inert), [false, false, true]);
 	assert.equal(span.style.color, '');
@@ -92,3 +95,7 @@ const timing = vm.createContext({ words: [border], innerWidth: 1000, innerHeight
 vm.runInContext(`const SWEEP = 256, JITTER = 72, RAMP = 160; ${delays}`, timing);
 assert.equal(border.delay[0], border.delay[1], 'Border extent must not delay its crossover.');
 assert.equal(border.ready, 160);
+
+const reduced = vm.createContext({document:{createElement:()=>({getContext:()=>({})}),documentElement:{classList:{contains:()=>true,remove(){}}},readyState:'complete'},performance:{getEntriesByType:()=>[{type:'back_forward'}]},matchMedia:()=>({matches:true})});
+vm.runInContext(source, reduced);
+vm.runInContext('lightUp()', reduced); // No rasterization or animation APIs needed with reduced motion.

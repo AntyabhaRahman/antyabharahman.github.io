@@ -1,0 +1,194 @@
+[
+  {
+    "bodyWidth": 306,
+    "documentWidth": 306,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/",
+    "viewport": 320
+  },
+  {
+    "bodyWidth": 306,
+    "documentWidth": 306,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/projects/",
+    "viewport": 320
+  },
+  {
+    "bodyWidth": 306,
+    "documentWidth": 306,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/blog/",
+    "viewport": 320
+  },
+  {
+    "bodyWidth": 306,
+    "documentWidth": 306,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/research/",
+    "viewport": 320
+  },
+  {
+    "bodyWidth": 306,
+    "documentWidth": 306,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/projects/mnist_d_transformers/",
+    "viewport": 320
+  },
+  {
+    "bodyWidth": 306,
+    "documentWidth": 306,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/projects/pyspark_similarity_join/",
+    "viewport": 320
+  },
+  {
+    "bodyWidth": 306,
+    "documentWidth": 357,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "viewport": 320
+  },
+  {
+    "bodyWidth": 306,
+    "documentWidth": 306,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/404.html",
+    "viewport": 320
+  },
+  {
+    "bodyWidth": 386,
+    "documentWidth": 386,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/",
+    "viewport": 400
+  },
+  {
+    "bodyWidth": 386,
+    "documentWidth": 386,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/projects/",
+    "viewport": 400
+  },
+  {
+    "bodyWidth": 386,
+    "documentWidth": 386,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/blog/",
+    "viewport": 400
+  },
+  {
+    "bodyWidth": 386,
+    "documentWidth": 386,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/research/",
+    "viewport": 400
+  },
+  {
+    "bodyWidth": 386,
+    "documentWidth": 386,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/projects/mnist_d_transformers/",
+    "viewport": 400
+  },
+  {
+    "bodyWidth": 386,
+    "documentWidth": 386,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/projects/pyspark_similarity_join/",
+    "viewport": 400
+  },
+  {
+    "bodyWidth": 386,
+    "documentWidth": 386,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "viewport": 400
+  },
+  {
+    "bodyWidth": 386,
+    "documentWidth": 386,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/404.html",
+    "viewport": 400
+  },
+  {
+    "bodyWidth": 786,
+    "documentWidth": 786,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/",
+    "viewport": 800
+  },
+  {
+    "bodyWidth": 786,
+    "documentWidth": 786,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/projects/",
+    "viewport": 800
+  },
+  {
+    "bodyWidth": 786,
+    "documentWidth": 786,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/blog/",
+    "viewport": 800
+  },
+  {
+    "bodyWidth": 786,
+    "documentWidth": 786,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/research/",
+    "viewport": 800
+  },
+  {
+    "bodyWidth": 786,
+    "documentWidth": 786,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/projects/mnist_d_transformers/",
+    "viewport": 800
+  },
+  {
+    "bodyWidth": 786,
+    "documentWidth": 786,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/projects/pyspark_similarity_join/",
+    "viewport": 800
+  },
+  {
+    "bodyWidth": 786,
+    "documentWidth": 786,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "viewport": 800
+  },
+  {
+    "bodyWidth": 786,
+    "documentWidth": 786,
+    "headingOverflow": false,
+    "navSize": "12.48px",
+    "path": "/404.html",
+    "viewport": 800
+  }
+]

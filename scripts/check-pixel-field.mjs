@@ -45,6 +45,10 @@ globalThis.requestAnimationFrame = (callback) => { nextFrame = callback; return 
 let stopped = false;
 globalThis.cancelAnimationFrame = () => { stopped = true; };
 
+let motionChanged;
+const motion = { matches: false, addEventListener: (_, callback) => motionChanged = callback, removeEventListener: () => motionChanged = null };
+globalThis.matchMedia = () => motion;
+
 const field = mountPixelField(canvas, { mode: 'ambient' });
 assert.ok(fills.some(([x, y, w, h]) => x === 792 && y === 54 && w === 17 && h === 17));
 fills.length = 0;
@@ -116,3 +120,33 @@ for (let i = 1; i <= 150; i++) {
 }
 assert.equal(signature.digest('hex'), '8bd8673699b02dadf31c986f76d0d4c376e84077351c1331efd93c6641528cda', 'Terrain, pointer and optimizer drawings must preserve the original output.');
 rendering.destroy();
+signature = null;
+
+// Reduced motion paints a static field, responds immediately to themes, and resumes on opt-in.
+motion.matches = true;
+nextFrame = null;
+const staticField = mountPixelField(canvas, { mode: 'ambient' });
+assert.equal(nextFrame, null, 'Reduced motion must not schedule ambient animation.');
+fills.length = 0;
+pointerHandlers.get('pointermove')({ pointerType: 'mouse', clientX: 450, clientY: 220 });
+assert.equal(nextFrame, null, 'Reduced motion must not start a pointer trail.');
+documentHandlers.get('themechange')({ detail: { x: 0, y: 0 } });
+assert.ok(fills.length > 0, 'Static field updates its theme immediately.');
+assert.equal(nextFrame, null);
+motion.matches = false;
+motionChanged();
+assert.equal(typeof nextFrame, 'function', 'Motion resumes when preference changes.');
+stopped = false;
+motion.matches = true;
+motionChanged();
+assert.equal(stopped, true, 'Changing preference stops an active animation.');
+staticField.destroy();
+assert.equal(motionChanged, null, 'Destroy removes the preference listener.');
+
+// Without a CSS view transition, theme fallback must not create a separate canvas wipe.
+motion.matches = false;
+nextFrame = null;
+const fallback = mountPixelField(canvas, { mode: 'trail' });
+documentHandlers.get('themechange')({ detail: null });
+assert.equal(nextFrame, null, 'Fallback theme changes redraw without a wave.');
+fallback.destroy();
