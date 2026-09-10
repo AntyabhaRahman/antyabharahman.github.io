@@ -1,0 +1,546 @@
+[
+  {
+    "bodyWidth": 306,
+    "headings": [
+      {
+        "font": "21.0747px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 306,
+    "path": "/",
+    "reduced": true,
+    "width": 320
+  },
+  {
+    "bodyWidth": 306,
+    "headings": [
+      {
+        "font": "38.4px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 306,
+    "path": "/projects/",
+    "reduced": true,
+    "width": 320
+  },
+  {
+    "bodyWidth": 306,
+    "headings": [
+      {
+        "font": "38.4px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 306,
+    "path": "/blog/",
+    "reduced": true,
+    "width": 320
+  },
+  {
+    "bodyWidth": 306,
+    "headings": [
+      {
+        "font": "38.4px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 306,
+    "path": "/research/",
+    "reduced": true,
+    "width": 320
+  },
+  {
+    "bodyWidth": 306,
+    "headings": [
+      {
+        "font": "24px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 306,
+    "path": "/projects/mnist_d_transformers/",
+    "reduced": true,
+    "width": 320
+  },
+  {
+    "bodyWidth": 306,
+    "headings": [
+      {
+        "font": "24px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 306,
+    "path": "/projects/pyspark_similarity_join/",
+    "reduced": true,
+    "width": 320
+  },
+  {
+    "bodyWidth": 306,
+    "headings": [
+      {
+        "font": "24px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 306,
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "reduced": true,
+    "width": 320
+  },
+  {
+    "bodyWidth": 306,
+    "headings": [
+      {
+        "font": "38.4px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 306,
+    "path": "/404.html",
+    "reduced": true,
+    "width": 320
+  },
+  {
+    "bodyWidth": 386,
+    "headings": [
+      {
+        "font": "26px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 386,
+    "path": "/",
+    "reduced": true,
+    "width": 400
+  },
+  {
+    "bodyWidth": 386,
+    "headings": [
+      {
+        "font": "38.4px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 386,
+    "path": "/projects/",
+    "reduced": true,
+    "width": 400
+  },
+  {
+    "bodyWidth": 386,
+    "headings": [
+      {
+        "font": "38.4px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 386,
+    "path": "/blog/",
+    "reduced": true,
+    "width": 400
+  },
+  {
+    "bodyWidth": 386,
+    "headings": [
+      {
+        "font": "38.4px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 386,
+    "path": "/research/",
+    "reduced": true,
+    "width": 400
+  },
+  {
+    "bodyWidth": 386,
+    "headings": [
+      {
+        "font": "24px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 386,
+    "path": "/projects/mnist_d_transformers/",
+    "reduced": true,
+    "width": 400
+  },
+  {
+    "bodyWidth": 386,
+    "headings": [
+      {
+        "font": "24px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 386,
+    "path": "/projects/pyspark_similarity_join/",
+    "reduced": true,
+    "width": 400
+  },
+  {
+    "bodyWidth": 386,
+    "headings": [
+      {
+        "font": "24px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 386,
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "reduced": true,
+    "width": 400
+  },
+  {
+    "bodyWidth": 386,
+    "headings": [
+      {
+        "font": "38.4px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "14.4px",
+    "overlappingNav": false,
+    "pageWidth": 386,
+    "path": "/404.html",
+    "reduced": true,
+    "width": 400
+  },
+  {
+    "bodyWidth": 786,
+    "headings": [
+      {
+        "font": "26px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 786,
+    "path": "/",
+    "reduced": true,
+    "width": 800
+  },
+  {
+    "bodyWidth": 786,
+    "headings": [
+      {
+        "font": "39.25px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 786,
+    "path": "/projects/",
+    "reduced": true,
+    "width": 800
+  },
+  {
+    "bodyWidth": 786,
+    "headings": [
+      {
+        "font": "39.25px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 786,
+    "path": "/blog/",
+    "reduced": true,
+    "width": 800
+  },
+  {
+    "bodyWidth": 786,
+    "headings": [
+      {
+        "font": "39.25px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 786,
+    "path": "/research/",
+    "reduced": true,
+    "width": 800
+  },
+  {
+    "bodyWidth": 786,
+    "headings": [
+      {
+        "font": "29.83px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 786,
+    "path": "/projects/mnist_d_transformers/",
+    "reduced": true,
+    "width": 800
+  },
+  {
+    "bodyWidth": 786,
+    "headings": [
+      {
+        "font": "29.83px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 786,
+    "path": "/projects/pyspark_similarity_join/",
+    "reduced": true,
+    "width": 800
+  },
+  {
+    "bodyWidth": 786,
+    "headings": [
+      {
+        "font": "29.83px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 786,
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "reduced": true,
+    "width": 800
+  },
+  {
+    "bodyWidth": 786,
+    "headings": [
+      {
+        "font": "39.25px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 786,
+    "path": "/404.html",
+    "reduced": true,
+    "width": 800
+  },
+  {
+    "bodyWidth": 1295,
+    "headings": [
+      {
+        "font": "30.4px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 1295,
+    "path": "/",
+    "reduced": true,
+    "width": 1309
+  },
+  {
+    "bodyWidth": 1295,
+    "headings": [
+      {
+        "font": "64.7045px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 1295,
+    "path": "/projects/",
+    "reduced": true,
+    "width": 1309
+  },
+  {
+    "bodyWidth": 1295,
+    "headings": [
+      {
+        "font": "64.7045px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 1295,
+    "path": "/blog/",
+    "reduced": true,
+    "width": 1309
+  },
+  {
+    "bodyWidth": 1295,
+    "headings": [
+      {
+        "font": "64.7045px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 1295,
+    "path": "/research/",
+    "reduced": true,
+    "width": 1309
+  },
+  {
+    "bodyWidth": 1295,
+    "headings": [
+      {
+        "font": "44.8px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 1295,
+    "path": "/projects/mnist_d_transformers/",
+    "reduced": true,
+    "width": 1309
+  },
+  {
+    "bodyWidth": 1295,
+    "headings": [
+      {
+        "font": "44.8px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 1295,
+    "path": "/projects/pyspark_similarity_join/",
+    "reduced": true,
+    "width": 1309
+  },
+  {
+    "bodyWidth": 1295,
+    "headings": [
+      {
+        "font": "44.8px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 1295,
+    "path": "/research/probing-the-origins-of-reasoning-performance/",
+    "reduced": true,
+    "width": 1309
+  },
+  {
+    "bodyWidth": 1295,
+    "headings": [
+      {
+        "font": "64.7045px",
+        "overflow": false
+      }
+    ],
+    "hover": true,
+    "mainCount": 1,
+    "navFont": "12.48px",
+    "overlappingNav": false,
+    "pageWidth": 1295,
+    "path": "/404.html",
+    "reduced": true,
+    "width": 1309
+  }
+]

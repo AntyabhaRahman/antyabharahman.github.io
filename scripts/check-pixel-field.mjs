@@ -160,3 +160,22 @@ const fallback = mountPixelField(canvas, { mode: 'trail' });
 documentHandlers.get('themechange')({ detail: null });
 assert.equal(nextFrame, null, 'Fallback theme changes redraw without a wave.');
 fallback.destroy();
+
+// Ten reduced frames must reach the same rendered state as one normal frame.
+function ambientSnapshot(reduced, frames) {
+	motion.matches = reduced;
+	clock = 0;
+	const instance = mountPixelField(canvas, { mode: 'ambient' });
+	for (let i = 0; i < frames; i++) { clock += 34; nextFrame(clock); }
+	signature = createHash('sha256');
+	// Switching to reduced motion forces a full repaint without advancing the clock.
+	motion.matches = true;
+	motionChanged();
+	const result = signature.digest('hex');
+	signature = null;
+	instance.destroy();
+	return result;
+}
+const normalFrame = ambientSnapshot(false, 1);
+assert.notEqual(normalFrame, ambientSnapshot(false, 0), 'The comparison must detect actual terrain movement.');
+assert.equal(ambientSnapshot(true, 10), normalFrame, 'Reduced motion must advance at exactly one-tenth normal speed.');

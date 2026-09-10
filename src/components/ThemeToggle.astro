@@ -33,7 +33,7 @@
 		btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
 	}
 
-	// A null origin keeps fallback and reduced-motion theme changes immediate.
+	// A null origin skips the canvas wave; reduced motion uses a 120ms CSS dissolve.
 	function apply(origin: { x: number; y: number } | null = null) {
 		root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
 		// Persistence is optional; blocked storage must not interrupt the visible theme update.
