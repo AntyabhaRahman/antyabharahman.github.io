@@ -24,7 +24,7 @@ for (const blocked of [false, true]) for (const reduced of [false, true]) for (c
 	assert.equal(root.dataset.theme, 'light');
 	assert.equal(label, 'Switch to dark mode');
 	assert.equal(events, 1);
-	assert.equal(transitionCount, transitions && !reduced ? 1 : 0);
+	assert.equal(transitionCount, transitions ? 1 : 0, 'Reduced motion retains the CSS theme dissolve.');
 	assert.equal(detail !== null, transitions && !reduced, 'Canvas wave runs only alongside an enabled view transition.');
 	clicked();
 	assert.equal(label, 'Switch to light mode');

@@ -122,26 +122,36 @@ assert.equal(signature.digest('hex'), '8bd8673699b02dadf31c986f76d0d4c376e840773
 rendering.destroy();
 signature = null;
 
-// Reduced motion paints a static field, responds immediately to themes, and resumes on opt-in.
+// Reduced motion keeps gentle ambient movement without pointer trails.
 motion.matches = true;
 nextFrame = null;
-const staticField = mountPixelField(canvas, { mode: 'ambient' });
-assert.equal(nextFrame, null, 'Reduced motion must not schedule ambient animation.');
+const slowField = mountPixelField(canvas, { mode: 'ambient' });
+assert.equal(typeof nextFrame, 'function', 'Reduced motion keeps ambient animation running.');
 fills.length = 0;
 pointerHandlers.get('pointermove')({ pointerType: 'mouse', clientX: 450, clientY: 220 });
-assert.equal(nextFrame, null, 'Reduced motion must not start a pointer trail.');
+assert.equal(fills.length, 0, 'Reduced motion ignores pointer input.');
 documentHandlers.get('themechange')({ detail: { x: 0, y: 0 } });
-assert.ok(fills.length > 0, 'Static field updates its theme immediately.');
-assert.equal(nextFrame, null);
+clock += 34;
+nextFrame(clock);
+assert.ok(fills.length > 0, 'Slow field updates its theme on the next frame.');
+fills.length = 0;
+for (let i = 0; i < 150; i++) { clock += 34; nextFrame(clock); }
+assert.ok(fills.length > 0, 'Reduced ambient terrain continues changing.');
 motion.matches = false;
 motionChanged();
 assert.equal(typeof nextFrame, 'function', 'Motion resumes when preference changes.');
 stopped = false;
 motion.matches = true;
 motionChanged();
-assert.equal(stopped, true, 'Changing preference stops an active animation.');
-staticField.destroy();
+assert.equal(stopped, true, 'Changing preference resets active pointer effects.');
+assert.equal(typeof nextFrame, 'function', 'Ambient motion resumes at the reduced speed.');
+slowField.destroy();
 assert.equal(motionChanged, null, 'Destroy removes the preference listener.');
+nextFrame = null;
+const reducedTrail = mountPixelField(canvas, { mode: 'trail' });
+pointerHandlers.get('pointermove')({ pointerType: 'mouse', clientX: 450, clientY: 220 });
+assert.equal(nextFrame, null, 'Reduced motion never starts a pointer trail.');
+reducedTrail.destroy();
 
 // Without a CSS view transition, theme fallback must not create a separate canvas wipe.
 motion.matches = false;

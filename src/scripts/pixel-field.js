@@ -495,7 +495,7 @@ export function mountPixelField(canvas, options) {
 		frameId = requestAnimationFrame(frame);
 		// Slow ambient terrain updates at 30 Hz; pointer heat and theme wipes retain full rate.
 		if (!trail && !live && !wave && !pendingPulse && now - last < 1000 / 30 - 1) return;
-		const dt = Math.min(0.05, (now - last) / 1000) * PLAYBACK_RATE;
+		const dt = Math.min(0.05, (now - last) / 1000) * PLAYBACK_RATE * (motion.matches ? 0.1 : 1);
 		last = now;
 		time += dt;
 		decay(dt);
@@ -513,7 +513,7 @@ export function mountPixelField(canvas, options) {
 	}
 
 	function start() {
-		if (motion.matches || frameId || !onScreen || cols === 0) return;
+		if ((motion.matches && trail) || frameId || !onScreen || cols === 0) return;
 		if (trail && !live && !wave && !pendingPulse) return;
 		last = performance.now();
 		frameId = requestAnimationFrame(frame);
@@ -550,6 +550,7 @@ export function mountPixelField(canvas, options) {
 		clickPulse = 0;
 		full = true;
 		redraw();
+		start();
 	}
 
 	motion.addEventListener('change', onMotion);

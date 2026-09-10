@@ -49,8 +49,9 @@
 		// scale, which put the circle at the top centre. Percentages land on the button.
 		root.style.setProperty('--vt-x', `${(origin.x / innerWidth) * 100}%`);
 		root.style.setProperty('--vt-y', `${(origin.y / innerHeight) * 100}%`);
-		if ('startViewTransition' in document && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-			(document as any).startViewTransition(() => apply(origin));
+		if ('startViewTransition' in document) {
+			const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+			(document as any).startViewTransition(() => apply(reduced ? null : origin));
 		} else {
 			apply();
 		}

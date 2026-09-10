@@ -236,4 +236,10 @@ canvas.pf { display: block; pointer-events: none; opacity: var(--pf-opacity, 0.8
 
 @media (prefers-reduced-motion: reduce) {
 	*, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+	.panel-body { transform: none; transition: opacity 120ms ease-out !important; }
+	.u { transition: text-decoration-color 120ms ease-out !important; }
+	.theme-toggle .sun, .theme-toggle .moon { transition: opacity 120ms ease-out !important; }
+	::view-transition-group(root), ::view-transition-old(root) { animation: none !important; }
+	::view-transition-new(root) { animation: reduced-theme-fade 120ms ease-out both !important; }
 }
+@keyframes reduced-theme-fade { from { opacity: 0; } to { opacity: 1; } }
