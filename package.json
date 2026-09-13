@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build && node scripts/check-built-security.mjs && node scripts/check-built-code.mjs",
     "preview": "astro preview",
-    "test": "node scripts/check-pixel-field.mjs && node scripts/check-pixel-entrance.mjs && node scripts/check-theme.mjs"
+    "test": "node scripts/check-pixel-field.mjs && node scripts/check-pixel-entrance.mjs && node scripts/check-theme.mjs && node --experimental-strip-types scripts/check-content.mjs && node scripts/check-site-layout.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.0",

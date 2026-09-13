@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { byDate } from '../../utils';
+import { byDate, venueWithYear } from '../../utils';
 import Base from '../../layouts/Base.astro';
 const papers = (await getCollection('research')).sort(byDate);
 ---
@@ -15,7 +15,7 @@ const papers = (await getCollection('research')).sort(byDate);
 					<p class="muted" style="margin:0">{p.data.authors.join(', ')}</p>
 					<p style="margin:0">{p.data.description}</p>
 					<div class="meta">
-						<span class="hand">{p.data.venue}, {p.data.date.getFullYear()}</span>
+						<span class="hand">{venueWithYear(p.data.venue, p.data.date)}</span>
 						{p.data.openreview && <a class="u" href={p.data.openreview}>OpenReview</a>}
 						{p.data.pdf && <a class="u" href={p.data.pdf}>PDF</a>}
 						{p.data.arxiv && <a class="u" href={p.data.arxiv}>arXiv</a>}

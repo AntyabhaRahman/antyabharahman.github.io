@@ -15,7 +15,7 @@ const { city = '[CITY]', email, cv } = Astro.props;
 		<p class="about-copy">working on ai safety</p>
 		<div class="about-links">
 			<a class="u" href="https://github.com/AntyabhaRahman">github</a>
-			{cv ? <a class="u" href={cv}>resume</a> : <span>Resume available on request via email</span>}
+			{cv ? <a class="u" href={cv}>Résumé (PDF)</a> : <span>Resume available on request via email</span>}
 			{email ? <span class="about-email">{email.replaceAll('@', ' [at] ')}</span> : <span>[EMAIL]</span>}
 		</div>
 	</div>

@@ -4,7 +4,7 @@ import vm from 'node:vm';
 
 // Run the real entrance lifecycle with drawing stubbed out; no browser dependency.
 const source = readFileSync(new URL('../src/scripts/pixel-type.js', import.meta.url), 'utf8');
-for (const finish of ['complete', 'resize', 'reduced']) {
+for (const finish of ['complete', 'resize', 'scroll-x', 'scroll-y', 'reduced', 'initial-scroll', 'fragment']) {
 	const motion = { matches: false };
 	const elements = [{ inert: false }, { inert: false }, { inert: true }];
 	const classes = new Set(['px-wait']);
@@ -13,6 +13,7 @@ for (const finish of ['complete', 'resize', 'reduced']) {
 	const graphic = { style: {} };
 	let frame;
 	let scrollReads = 0;
+	let scrollLeft = 0;
 	const drawing = { setTransform() {}, clearRect() {}, transform() {}, fillRect() {} };
 	const context = vm.createContext({
 		matchMedia: () => motion,
@@ -25,13 +26,14 @@ for (const finish of ['complete', 'resize', 'reduced']) {
 		},
 		getComputedStyle: () => ({ opacity: '1', getPropertyValue: () => '#000' }),
 		performance: { getEntriesByType: () => [{ type: 'back_forward' }], now: () => 0 },
-		devicePixelRatio: 1.1, innerWidth: 1000, innerHeight: 800, scrollX: 0, scrollY: 0,
+		location: { hash: finish === 'fragment' ? '#section' : '' },
+		devicePixelRatio: 1.1, innerWidth: 1000, innerHeight: 800, scrollX: 0, scrollY: finish === 'initial-scroll' ? 400 : 0,
 		addEventListener: (name, handler) => handlers.set(name, handler),
 		removeEventListener: (name) => handlers.delete(name),
 		requestAnimationFrame: (callback) => { frame = callback; },
 		span, graphic,
 	});
-	Object.defineProperty(context, 'scrollX', { get() { scrollReads++; return 0; } });
+	Object.defineProperty(context, 'scrollX', { get() { scrollReads++; return scrollLeft; } });
 	vm.runInContext(source, context);
 	classes.add('px-wait');
 	vm.runInContext(`
@@ -44,6 +46,13 @@ for (const finish of ['complete', 'resize', 'reduced']) {
 		}, { graphic, cell: 3, cells: [0, 0], color: '#000', place: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0, transformPoint: () => ({ x: 0, y: 0 }) } }]; };
 		lightUp();
 	`, context);
+	if (finish === 'initial-scroll' || finish === 'fragment') {
+		assert.equal(classes.has('px-live'), false, 'Scrolled or fragment entry must never animate.');
+		assert.equal(classes.has('px-wait'), false);
+		assert.equal(frame, undefined);
+		assert.equal(context.sampledScale, undefined, 'Skip sampling entirely on scrolled entry.');
+		continue;
+	}
 	assert.equal(context.sampledScale, 2, 'fractional display scale must use integer raster indexes');
 	assert.ok(classes.has('px-live'));
 	scrollReads = 0;
@@ -54,6 +63,8 @@ for (const finish of ['complete', 'resize', 'reduced']) {
 		context.innerWidth = 500;
 		handlers.get('resize')();
 	}
+	if (finish === 'scroll-x') scrollLeft = 120;
+	if (finish === 'scroll-y') context.scrollY = 400;
 	if (finish === 'reduced') motion.matches = true;
 	frame(finish === 'complete' ? 7000 : 210);
 	assert.equal(classes.has('px-live'), false);
@@ -64,7 +75,7 @@ for (const finish of ['complete', 'resize', 'reduced']) {
 	vm.runInContext('lightUp()', context);
 	assert.equal(classes.has('px-live'), false, 'Never restart the entrance after text is already revealed.');
 }
-console.log('Entrance locks and restores interaction on completion and resize.');
+console.log('Entrance restores interaction on completion, resize, scroll, and reduced motion.');
 
 // The crossover reaches both endpoints gently and keeps a monotone, overlapping handoff.
 const ctx = vm.createContext({document:{createElement:()=>({getContext:()=>({})}),documentElement:{classList:{remove(){}}},readyState:'complete'},performance:{getEntriesByType:()=>[{type:'back_forward'}]}});
@@ -99,3 +110,22 @@ assert.equal(border.ready, 160);
 const reduced = vm.createContext({document:{createElement:()=>({getContext:()=>({})}),documentElement:{classList:{contains:()=>true,remove(){}}},readyState:'complete'},performance:{getEntriesByType:()=>[{type:'back_forward'}]},matchMedia:()=>({matches:true})});
 vm.runInContext(source, reduced);
 vm.runInContext('lightUp()', reduced); // No rasterization or animation APIs needed with reduced motion.
+
+// Fonts may delay startup until the browser has restored a reload's scroll offset.
+for (const type of ['navigate', 'reload']) {
+	const classes = new Set(['px-wait']);
+	const entry = vm.createContext({
+		document: {
+			createElement: () => ({ getContext: () => ({}) }),
+			documentElement: { classList: { contains: c => classes.has(c), remove: c => classes.delete(c) } },
+			readyState: 'complete', fonts: { ready: Promise.resolve() },
+		},
+		performance: { getEntriesByType: () => [{ type }] },
+		location: { hash: '' }, scrollX: 0, scrollY: 0,
+		matchMedia: () => ({ matches: false }),
+	});
+	vm.runInContext(source, entry);
+	entry.scrollY = 800;
+	await new Promise(resolve => setImmediate(resolve));
+	assert.equal(classes.has('px-wait'), false, 'Late restored scroll skips the entrance after fonts load.');
+}

@@ -122,32 +122,30 @@ assert.equal(signature.digest('hex'), '8bd8673699b02dadf31c986f76d0d4c376e840773
 rendering.destroy();
 signature = null;
 
-// Reduced motion keeps gentle ambient movement without pointer trails.
+// Reduced motion paints once, then only repaints for layout or theme changes.
 motion.matches = true;
 nextFrame = null;
-const slowField = mountPixelField(canvas, { mode: 'ambient' });
-assert.equal(typeof nextFrame, 'function', 'Reduced motion keeps ambient animation running.');
+fills.length = 0;
+const staticField = mountPixelField(canvas, { mode: 'ambient' });
+assert.ok(fills.length > 0, 'Reduced motion still paints the ambient terrain.');
+assert.equal(nextFrame, null, 'Reduced motion schedules no autonomous animation.');
 fills.length = 0;
 pointerHandlers.get('pointermove')({ pointerType: 'mouse', clientX: 450, clientY: 220 });
 assert.equal(fills.length, 0, 'Reduced motion ignores pointer input.');
 documentHandlers.get('themechange')({ detail: { x: 0, y: 0 } });
-clock += 34;
-nextFrame(clock);
-assert.ok(fills.length > 0, 'Slow field updates its theme on the next frame.');
-fills.length = 0;
-for (let i = 0; i < 150; i++) { clock += 34; nextFrame(clock); }
-assert.ok(fills.length > 0, 'Reduced ambient terrain continues changing.');
+assert.ok(fills.length > 0, 'Static terrain repaints its theme immediately.');
+assert.equal(nextFrame, null, 'Theme changes do not animate reduced-motion terrain.');
 motion.matches = false;
 motionChanged();
 assert.equal(typeof nextFrame, 'function', 'Motion resumes when preference changes.');
 stopped = false;
+nextFrame = null;
 motion.matches = true;
 motionChanged();
-assert.equal(stopped, true, 'Changing preference resets active pointer effects.');
-assert.equal(typeof nextFrame, 'function', 'Ambient motion resumes at the reduced speed.');
-slowField.destroy();
+assert.equal(stopped, true, 'Changing preference stops active animation.');
+assert.equal(nextFrame, null, 'Reduced motion does not restart animation.');
+staticField.destroy();
 assert.equal(motionChanged, null, 'Destroy removes the preference listener.');
-nextFrame = null;
 const reducedTrail = mountPixelField(canvas, { mode: 'trail' });
 pointerHandlers.get('pointermove')({ pointerType: 'mouse', clientX: 450, clientY: 220 });
 assert.equal(nextFrame, null, 'Reduced motion never starts a pointer trail.');
@@ -160,22 +158,3 @@ const fallback = mountPixelField(canvas, { mode: 'trail' });
 documentHandlers.get('themechange')({ detail: null });
 assert.equal(nextFrame, null, 'Fallback theme changes redraw without a wave.');
 fallback.destroy();
-
-// Ten reduced frames must reach the same rendered state as one normal frame.
-function ambientSnapshot(reduced, frames) {
-	motion.matches = reduced;
-	clock = 0;
-	const instance = mountPixelField(canvas, { mode: 'ambient' });
-	for (let i = 0; i < frames; i++) { clock += 34; nextFrame(clock); }
-	signature = createHash('sha256');
-	// Switching to reduced motion forces a full repaint without advancing the clock.
-	motion.matches = true;
-	motionChanged();
-	const result = signature.digest('hex');
-	signature = null;
-	instance.destroy();
-	return result;
-}
-const normalFrame = ambientSnapshot(false, 1);
-assert.notEqual(normalFrame, ambientSnapshot(false, 0), 'The comparison must detect actual terrain movement.');
-assert.equal(ambientSnapshot(true, 10), normalFrame, 'Reduced motion must advance at exactly one-tenth normal speed.');

@@ -47,7 +47,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 /* Keep centered content fixed when font loading or viewport height changes the scrollbar. */
-html { scrollbar-gutter: stable; }
+html { scrollbar-gutter: stable; scroll-padding-top: calc(var(--header-height, 6rem) + 0.75rem); }
 
 body {
 	margin: 0;
@@ -126,12 +126,12 @@ a { color: inherit; text-decoration: none; }
 .px-live .note svg { transition: none; }
 .px-live .u { text-decoration-color: transparent; }
 .px-live :is(.prose, .page-lede) a { text-decoration-color: transparent; }
-.nav a[aria-current='page']::before, .panel-draw, .about-draw, .theme-toggle svg { transition: opacity 256ms ease; }
+.nav a[aria-current]::before, .panel-draw, .about-draw, .theme-toggle svg { transition: opacity 256ms ease; }
 /* Hidden under px-wait as well, so the class swap to px-live does not start a fade-out. */
-.px-wait .nav a[aria-current='page']::before, .px-wait .panel-draw, .px-wait .about-draw, .px-wait .theme-toggle svg, .px-wait .note svg,
-.px-live .nav a[aria-current='page']::before, .px-live .panel-draw, .px-live .about-draw, .px-live .theme-toggle svg { opacity: 0; }
+.px-wait .nav a[aria-current]::before, .px-wait .panel-draw, .px-wait .about-draw, .px-wait .theme-toggle svg, .px-wait .note svg,
+.px-live .nav a[aria-current]::before, .px-live .panel-draw, .px-live .about-draw, .px-live .theme-toggle svg { opacity: 0; }
 /* Native opacity animation overlaps the text handoff without adding raster or per-frame work. */
-.px-live .panel-draw, .px-live .about-draw, .px-live .theme-toggle svg, .px-live .nav a[aria-current='page']::before {
+.px-live .panel-draw, .px-live .about-draw, .px-live .theme-toggle svg, .px-live .nav a[aria-current]::before {
 	animation: px-decoration-in 256ms ease 256ms both;
 }
 @keyframes px-decoration-in {
@@ -139,6 +139,9 @@ a { color: inherit; text-decoration: none; }
 	to { opacity: 1; }
 }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
+main:focus-visible { outline: none; }
+main:focus-visible h1 { position: relative; }
+main:focus-visible h1::before { content: ''; position: absolute; top: -0.45rem; left: 0; width: 1.5rem; border-top: 3px solid var(--ink); }
 
 /* Solid card outline; the entrance controls its opacity. */
 .rough { position: relative; }
@@ -154,18 +157,24 @@ a { color: inherit; text-decoration: none; }
 @media (hover: hover) { .px-live .deck { pointer-events: none; } }
 
 .wrap { width: min(100% - 2.5rem, 72rem); margin-inline: auto; }
-.prose { max-width: var(--measure); }
+.prose { max-width: var(--measure); min-width: 0; overflow-wrap: anywhere; }
+.table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.2em; }
+.table-scroll table { margin: 0; overflow-wrap: normal; }
+.prose pre { max-width: 100%; overflow-wrap: normal; }
 .prose > :first-child { margin-top: 0; }
 
 /* Header and footer */
-.site-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.8rem 1.5rem; padding: 1.1rem 0; position: relative; z-index: 2; }
-.wordmark { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink); line-height: 1; white-space: nowrap; }
-.ident { display: flex; flex-wrap: wrap; gap: 0.35rem 1.4rem; align-items: baseline; }
+.site-header { position: sticky; top: 0; z-index: 2; background: var(--paper); flex-shrink: 0; }
+.site-header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.8rem 1.5rem; padding-block: 1.1rem; }
+.wordmark { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink); line-height: 1; white-space: normal; overflow-wrap: anywhere; }
+.ident { min-width: 0; max-width: 100%; display: flex; flex-wrap: wrap; gap: 0.35rem 1.4rem; align-items: baseline; }
 .role { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--graphite); white-space: nowrap; }
-.nav { display: flex; gap: 1.6rem; align-items: center; font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
-.nav a[aria-current='page'] { color: var(--ink); }
-.nav a[aria-current='page']::before { content: '•'; margin-right: 0.45em; font-family: var(--font-mono); }
-.site-footer { margin-top: auto; padding: 2rem 0 1.4rem; color: var(--graphite); font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; justify-content: space-between; }
+.nav { display: flex; flex-wrap: wrap; gap: 1.6rem; align-items: center; font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.nav a[aria-current] { color: var(--ink); }
+.nav a[aria-current]::before { content: '•' / ''; margin-right: 0.45em; font-family: var(--font-mono); }
+.site-footer { overflow-wrap: anywhere; margin-top: auto; padding: 2rem 0 1.4rem; color: var(--graphite); font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; justify-content: space-between; }
+
+.site-footer > * { min-width: 0; max-width: 100%; }
 
 /* A note stays on one line beside a list entry or as a back link. Under the article rail it wraps. */
 .panel-items .note, .article-rail > .note { white-space: nowrap; }
@@ -173,7 +182,7 @@ a { color: inherit; text-decoration: none; }
 /* Index lists and cards */
 .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; }
 .card { padding: 1.25rem 1.4rem 1.2rem; background: var(--paper); display: grid; gap: 0.35rem; }
-.card h2 { margin: 0; font-size: 1.2rem; }
+.card h2 { margin: 0; font-size: 1.2rem; overflow-wrap: anywhere; }
 .card p { max-width: var(--measure); }
 .card .meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; align-items: baseline; font-size: 0.85rem; color: var(--graphite); }
 .tag { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--graphite); }
@@ -211,14 +220,23 @@ canvas.pf { display: block; pointer-events: none; opacity: var(--pf-opacity, 0.8
 .hero-canvas { position: absolute; inset: 0; z-index: 0; }
 
 @media (max-width: 640px) {
-	.site-header { padding-top: 1.6rem; }
-	.nav { gap: 1rem; font-size: 0.9rem; }
+	.site-header-inner { padding-block: 0.7rem; row-gap: 0.35rem; }
+	.nav { gap: 0.5rem 0.9rem; font-size: 0.8rem; }
 }
 
 @media (max-width: 399px) {
-	.site-header { padding-block: 1.15rem 0.65rem; row-gap: 0.45rem; }
+	.site-header-inner { padding-block: 0.55rem; row-gap: 0.3rem; }
 	.role { display: none; }
-	.nav { width: 100%; justify-content: space-between; gap: clamp(0.35rem, 2vw, 0.75rem); }
+	.nav { width: 100%; justify-content: space-between; gap: 0.35rem 0.5rem; font-size: 0.75rem; letter-spacing: 0.06em; }
+}
+
+@media (max-height: 500px) {
+	.site-header-inner { padding-block: 0.35rem; gap: 0.25rem 1rem; }
+	.role { display: none; }
+}
+
+@media (max-width: 640px) {
+	.site-header-inner { padding-top: 1rem; }
 }
 
 /* Touch targets. The ink stays the same, the hit box grows. */
@@ -227,7 +245,7 @@ canvas.pf { display: block; pointer-events: none; opacity: var(--pf-opacity, 0.8
 	.card .meta { gap: 0.9rem 1.25rem; }
 	.card h2 a { display: inline-block; padding-block: 0.6rem; margin-block: -0.6rem; }
 	.note a { padding-block: 0.9rem; margin-block: -0.9rem; }
-	.nav a { padding-block: 0.7rem; margin-block: -0.7rem; }
+	.nav a { display: inline-flex; align-items: center; min-height: 2.75rem; padding-block: 0; margin-block: 0; }
 	.wordmark { display: inline-block; padding-block: 0.9rem; margin-block: -0.9rem; }
 }
 
@@ -236,10 +254,5 @@ canvas.pf { display: block; pointer-events: none; opacity: var(--pf-opacity, 0.8
 
 @media (prefers-reduced-motion: reduce) {
 	*, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-	.panel-body { transform: none; transition: opacity 120ms ease-out !important; }
-	.u { transition: text-decoration-color 120ms ease-out !important; }
-	.theme-toggle .sun, .theme-toggle .moon { transition: opacity 120ms ease-out !important; }
-	::view-transition-group(root), ::view-transition-old(root) { animation: none !important; }
-	::view-transition-new(root) { animation: reduced-theme-fade 120ms ease-out both !important; }
+	::view-transition-group(root), ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
 }
-@keyframes reduced-theme-fade { from { opacity: 0; } to { opacity: 1; } }

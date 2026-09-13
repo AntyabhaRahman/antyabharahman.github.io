@@ -11,7 +11,7 @@ const section = async (name: 'projects' | 'blog' | 'research') => {
 	return {
 		href: `/${name}/`,
 		count: all.length,
-		items: all.slice(0, 3).map((e) => ({ href: ('repo' in e.data && e.data.repo) || `/${name}/${e.id}/`, title: e.data.title, date: e.data.date })),
+		items: all.slice(0, 3).map((e) => ({ href: `/${name}/${e.id}/`, title: e.data.title, date: e.data.date })),
 	};
 };
 

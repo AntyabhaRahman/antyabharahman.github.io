@@ -269,7 +269,8 @@ function lightUp() {
 	// Slow fonts may finish after the fallback has already revealed the page.
 	if (!html.classList.contains('px-wait')) return;
 	const motion = matchMedia('(prefers-reduced-motion: reduce)');
-	if (motion.matches) return html.classList.remove('px-wait');
+	// Fragment scrolling may settle after fonts load; never sample a fragment entry.
+	if (motion.matches || scrollX || scrollY || location.hash) return html.classList.remove('px-wait');
 	// px-wait stays on through the sampling pass. Layout and canvas drawing do not need the text
 	// to be visible, and the marks that fade in at the end must never see a frame without a class.
 	// A hidden host, such as a deck body at rest on desktop, gets no cells. Its text would
@@ -321,8 +322,8 @@ function lightUp() {
 	html.classList.add('px-live');
 	html.classList.remove('px-wait');
 
-	// Words were measured in viewport coordinates at this scroll offset. A scroll during the
-	// light-up shifts the text canvas by the difference so the cells stay on their words.
+	// Scrolling changes the relative positions of sticky header and body text. End the
+	// entrance on scroll so the sampled canvas cannot drift away from either.
 	const sx0 = scrollX, sy0 = scrollY;
 	// A resize moves every word, but the cells were sampled once. The entrance ends at the
 	// next frame and the text shows in place.
@@ -376,7 +377,7 @@ function lightUp() {
 			}
 			ctx.globalAlpha = 1;
 		}
-		if (!done && t < 6000 && !resized && !motion.matches) {
+		if (!done && t < 6000 && !resized && !dx && !dy && !motion.matches) {
 			requestAnimationFrame(frame);
 			return;
 		}
@@ -407,5 +408,5 @@ const html = document.documentElement;
 // then reflows after the cells were sampled.
 const nav = performance.getEntriesByType('navigation')[0];
 const loaded = document.readyState === 'complete' ? Promise.resolve() : new Promise((r) => addEventListener('load', r, { once: true }));
-if (nav?.type === 'back_forward') html.classList.remove('px-wait');
+if (nav?.type === 'back_forward' || location.hash || scrollX || scrollY) html.classList.remove('px-wait');
 else loaded.then(() => document.fonts.ready).then(lightUp);

@@ -33,7 +33,7 @@
 		btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
 	}
 
-	// A null origin skips the canvas wave; reduced motion uses a 120ms CSS dissolve.
+	// A null origin updates canvas colors immediately without a wave.
 	function apply(origin: { x: number; y: number } | null = null) {
 		root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
 		// Persistence is optional; blocked storage must not interrupt the visible theme update.
@@ -49,9 +49,8 @@
 		// scale, which put the circle at the top centre. Percentages land on the button.
 		root.style.setProperty('--vt-x', `${(origin.x / innerWidth) * 100}%`);
 		root.style.setProperty('--vt-y', `${(origin.y / innerHeight) * 100}%`);
-		if ('startViewTransition' in document) {
-			const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-			(document as any).startViewTransition(() => apply(reduced ? null : origin));
+		if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'startViewTransition' in document) {
+			(document as any).startViewTransition(() => apply(origin));
 		} else {
 			apply();
 		}

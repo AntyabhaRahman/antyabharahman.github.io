@@ -32,22 +32,25 @@ const nav = [
 		    safety net if it fails. The inline source is hashed for CSP at build time. */}
 		{/* The same two rules as in global.css. Inline, they hold before the stylesheet arrives,
 		    so WebKit never paints the marks for one frame. */}
-		<style is:inline>.px-wait [data-px],.px-wait [data-px-border]{visibility:hidden}.px-wait .nav a[aria-current='page']::before,.px-wait .panel-draw,.px-wait .about-draw,.px-wait .theme-toggle svg,.px-wait .note svg{opacity:0}</style>
+		<style is:inline>.px-wait [data-px],.px-wait [data-px-border]{visibility:hidden}.px-wait .nav a[aria-current]::before,.px-wait .panel-draw,.px-wait .about-draw,.px-wait .theme-toggle svg,.px-wait .note svg{opacity:0}</style>
 	</head>
 	<body>
 		<script is:inline set:html={themeInit} />
 		<a class="skip-link" href="#main">Skip to content</a>
-		<header class="site-header wrap">
+		<header class="site-header">
+			<div class="site-header-inner wrap">
 			<div class="ident"><a class="wordmark" href="/" data-px>Antyabha Rahman</a><span class="role" data-px>Engineer and researcher</span></div>
 			<nav class="nav" aria-label="Site">
 				{nav.map(([href, label]) => (
-					<a class="u" href={href} aria-current={path.startsWith(href) ? 'page' : undefined} data-px>{label}</a>
+					<a class="u" href={href} aria-current={path === href ? 'page' : path.startsWith(href) ? 'true' : undefined} data-px>{label}</a>
 				))}
 				<ThemeToggle />
 			</nav>
+			</div>
 		</header>
 		<slot />
 		<script>
+			import '../scripts/site-layout.js';
 			import '../scripts/pixel-type.js';
 		</script>
 		<footer class="site-footer wrap" data-px>

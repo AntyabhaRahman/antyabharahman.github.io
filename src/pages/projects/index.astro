@@ -11,7 +11,7 @@ const projects = (await getCollection('projects')).sort(byDate);
 		<ol class="list list--grid">
 			{projects.map((p) => (
 				<li class="card rough" data-px data-px-border>
-					<h2><a class="u" href={p.data.repo || `/projects/${p.id}/`}>{p.data.title}</a></h2>
+					<h2><a class="u" href={`/projects/${p.id}/`}>{p.data.title}</a></h2>
 					<p class="muted" style="margin:0">{p.data.description}</p>
 					<div class="meta">
 						<span class="hand">{p.data.status === 'active' ? 'in progress' : p.data.date.getFullYear()}</span>
