@@ -205,6 +205,8 @@ main:focus-visible h1::before { content: ''; position: absolute; top: -0.45rem; 
 .article .meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-items: baseline; color: var(--graphite); font-size: 0.9rem; margin-top: 0.6rem; }
 .article .links { display: flex; flex-wrap: wrap; gap: 1.2rem; margin-top: 1rem; font-size: 0.95rem; }
 
+.article .links a { text-decoration-color: currentColor; }
+
 /* Pixel field canvases */
 canvas.pf { display: block; pointer-events: none; opacity: var(--pf-opacity, 0.85); }
 .pf-fixed { position: fixed; inset: 0; z-index: 0; --pf-opacity: 0.55; }

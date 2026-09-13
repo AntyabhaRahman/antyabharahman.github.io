@@ -12,7 +12,7 @@ const d = project.data;
 	<div slot="meta">
 		<div class="meta">{d.tags.map((t) => <span class="tag"><span class="tag-hash">#</span>{t}</span>)}</div>
 		<div class="links">
-			{d.repo && <a class="u" href={d.repo}>Repository</a>}
+			{d.repo && <a class="u" href={d.repo}>Code repo</a>}
 			{d.url && <a class="u" href={d.url}>Live site</a>}
 		</div>
 	</div>
