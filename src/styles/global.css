@@ -194,8 +194,8 @@ main:focus-visible h1::before { content: ''; position: absolute; top: -0.45rem; 
 
 /* Article */
 .article { position: relative; z-index: 1; padding-bottom: 3rem; }
-.article header { margin: 0.25rem 0 2.5rem; display: grid; grid-template-columns: 13rem minmax(0, var(--measure)); column-gap: 2rem; align-items: end; }
-.article-rail { grid-row: 1 / span 2; align-self: stretch; padding-right: 1rem; border-right: 1px solid var(--pencil); }
+.article header { margin: 0.25rem 0 2.5rem; display: grid; grid-template-columns: 13rem minmax(0, var(--measure)); column-gap: 2rem; align-items: center; }
+.article-rail { align-self: stretch; padding-right: 1rem; border-right: 1px solid var(--pencil); }
 .article-rail > .note { margin-left: 0.25rem; }
 .article-rail > p.hand { margin: 1rem 0 0.5rem; }
 .article-notes { margin-top: 2.5rem; display: grid; gap: 1.25rem; }
