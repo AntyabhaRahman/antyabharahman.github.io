@@ -4,7 +4,10 @@ Astro static site for projects, blog posts, and research papers. Blog and resear
 
 ## Run it
 
+Astro needs Node 22.12 or later. `.nvmrc` pins Node 24.
+
 ```bash
+nvm use
 npm install
 npm run dev
 ```
@@ -13,27 +16,56 @@ The dev server runs at http://localhost:4321. `npm run build` writes the site to
 
 ## Add content
 
-Each section is one folder under `src/content/`. One markdown file is one page. The file name is the URL slug.
+Each section is one folder under `src/content/`. One Markdown file is one page, and the file name is the URL slug. A new file shows up on its section page and on the home panel with no other change.
 
-| Folder | Frontmatter keys |
-| --- | --- |
-| `blog/` | `title`, `description`, `date`, `tags` |
-| `research/` | `title`, `authors`, `venue`, `date`, `description`, `tags`, optional `pdf`, `arxiv`, `code` |
-| `projects/` | `title`, `description`, `date`, `tags`, `status` (`active` or `done`), optional `repo`, `url` |
+| Folder | Required keys | Optional keys |
+| --- | --- | --- |
+| `blog/` | `title`, `description`, `date` | `tags`, `note` |
+| `research/` | `title`, `authors`, `venue`, `date`, `description` | `openreview`, `pdf`, `arxiv`, `code` |
+| `projects/` | `title`, `description`, `date` | `tags`, `status` (`active` or `done`), `repo`, `url` |
 
-The schema for each folder is in `src/content.config.ts`. The build fails if a file misses a key.
+The schema for each folder is in `src/content.config.ts`. If a file misses a required key, the build fails and names the file.
+
+Write titles in sentence case and capitalize the first word after a colon: "MASK-OFF: Evaluating LLMs for omission of material fact". The headline style does not change case, so the title shows as written.
+
+Each section lists its entries by `date`, newest first.
+
+### Add a blog post
+
+1. Create `src/content/blog/<slug>.md`. The post's URL is `/blog/<slug>/`.
+2. Add the frontmatter and the body:
+
+	```markdown
+	---
+	title: "Why probes beat ablations: A short note"
+	description: One line shown under the title in the blog list.
+	date: 2026-10-14
+	tags: [interpretability, rl]
+	note: One margin note shown beside the post.
+	---
+
+	The post body is plain Markdown.
+	```
+
+3. Run `npm run dev` and open the post to check it.
+4. Commit and push to `master`.
+
+Put images in `public/blog/` and link them as `![Alt text](/blog/figure.png)`. The content security policy in `astro.config.mjs` allows images only from the site itself, so an image hotlinked from another domain does not load.
+
+Every file in `blog/` is published. There is no draft flag.
+
+### Write math
 
 Write inline math as `$x$`. Write display math as `$$` on its own line, the equation, then `$$` on its own line. A `$$...$$` pair on a single line renders inline.
 
-The current files are placeholders. Replace them and keep the keys.
-
 ## Deploy
 
-`.github/workflows/deploy.yml` builds the site and publishes it to GitHub Pages on every push to `main`. In the repository settings, set Pages to deploy from GitHub Actions. The site URL is set in `astro.config.mjs`.
+`.github/workflows/deploy.yml` builds the site and publishes it to GitHub Pages on every push to `master`. In the repository settings, set Pages to deploy from GitHub Actions. The site URL is set in `astro.config.mjs`.
 
 ## Where things live
 
 - `src/styles/global.css` holds the color tokens for both themes, the fonts, and the rough-line filter class.
+- `public/fonts/` holds the self-hosted fonts. Headlines (the `.display` class) use Space Grotesk 700. Body text uses IBM Plex Sans, and labels use IBM Plex Mono.
 - `src/components/Deck.astro` is the home page panel row.
 - `src/components/ThemeToggle.astro` swaps the theme with a View Transition circle wipe and stores the choice in `localStorage`.
 - `src/scripts/pixel-field.js` draws the canvas field. `ambient` mode runs on the home page. `trail` mode runs behind article text.

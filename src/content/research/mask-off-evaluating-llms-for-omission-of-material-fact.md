@@ -3,7 +3,7 @@ title: "MASK-OFF: Evaluating LLMs for omission of material fact"
 authors: ["Antyabha Rahman", "Justin Michael Moeljono"]
 venue: AI4GOOD Workshop @ NeurIPS 2026 Poster
 date: 2026-10-02
-description: A benchmark of 500 scenarios that measures when LLMs leave out a material fact they know is harmful, with no pressure to conceal it.
+description: A benchmark of 500 scenarios that measures when LLMs leave out a material fact they know is harmful, without pressure to conceal it.
 openreview: https://openreview.net/forum?id=2fMvRl8Eiw
 code: https://github.com/AntyabhaRahman/MASK-OFF
 ---
