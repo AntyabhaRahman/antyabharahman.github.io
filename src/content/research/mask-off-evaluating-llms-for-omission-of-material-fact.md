@@ -1,5 +1,5 @@
 ---
-title: "MASK-OFF: evaluating LLMs for omission of material fact"
+title: "MASK-OFF: Evaluating LLMs for omission of material fact"
 authors: ["Antyabha Rahman", "Justin Michael Moeljono"]
 venue: AI4GOOD Workshop @ NeurIPS 2026 Poster
 date: 2026-10-02
