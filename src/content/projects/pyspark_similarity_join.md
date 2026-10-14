@@ -1,5 +1,5 @@
 ---
-title: Spatial-Textual Similarity Join with PySpark
+title: Spatial-textual similarity join with PySpark
 description: A PySpark pipeline that matches records by spatial proximity and textual similarity.
 date: 2026-05-02
 tags: [data-processing]

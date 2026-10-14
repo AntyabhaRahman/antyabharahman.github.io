@@ -1,5 +1,5 @@
 ---
-title: "Probing the Origins of Reasoning Performance: Representational Quality for Mathematical Problem-Solving in RL vs SFT Finetuned Models"
+title: "Probing the origins of reasoning performance: representational quality for mathematical problem-solving in RL vs SFT finetuned models"
 authors: ["Antyabha Rahman", "Akshaj Gurugubelli", "Omar Ankit", "Kevin Zhu", "Aishwarya Balwani"]
 venue: AAAI 2026 Workshop on XAI4Science
 date: 2026-07-28

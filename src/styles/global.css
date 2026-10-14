@@ -1,7 +1,7 @@
 /* Fonts. Self-hosted latin and latin-ext subsets of the Google Fonts files, so no cross-origin
    stylesheet blocks the first paint. */
-@font-face { font-family: 'Archivo'; font-style: normal; font-weight: 800; font-display: swap; src: url(/fonts/Archivo-800-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: 'Archivo'; font-style: normal; font-weight: 800; font-display: swap; src: url(/fonts/Archivo-800-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/SpaceGrotesk-700-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/SpaceGrotesk-700-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/IBMPlexMono-400-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/IBMPlexMono-400-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url(/fonts/IBMPlexMono-500-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
@@ -27,7 +27,7 @@
 	--grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 	--pf-bands: #c3c0b7, #9e9b92, #77756f, #504f49;
 	--pf-accent: #1a1a1a;
-	--font-display: 'Archivo', 'IBM Plex Sans', system-ui, sans-serif;
+	--font-display: 'Space Grotesk', 'IBM Plex Sans', system-ui, sans-serif;
 	--font-body: 'IBM Plex Sans', system-ui, sans-serif;
 	--font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 	--measure: 66ch;
@@ -84,7 +84,7 @@ h1 { font-size: clamp(2.4rem, 5vw, 4.2rem); }
 h2 { font-size: clamp(1.4rem, 2.4vw, 1.75rem); margin-top: 2em; }
 h3 { font-size: 1.15rem; margin-top: 1.6em; }
 p { margin: 0 0 1em; }
-.display { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: -0.03em; line-height: 0.95; }
+.display { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
 .hand { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--graphite); }
 .muted { color: var(--graphite); }
 code, pre, kbd { font-family: var(--font-mono); font-size: 0.92em; }
@@ -194,13 +194,13 @@ main:focus-visible h1::before { content: ''; position: absolute; top: -0.45rem; 
 
 /* Article */
 .article { position: relative; z-index: 1; padding-bottom: 3rem; }
-.article header { margin: 0.25rem 0 2.5rem; display: grid; grid-template-columns: 13rem minmax(0, var(--measure)); gap: 2rem; align-items: end; }
+.article header { margin: 0.25rem 0 2.5rem; display: grid; grid-template-columns: 13rem minmax(0, var(--measure)); column-gap: 2rem; align-items: end; }
 .article-rail { grid-row: 1 / span 2; align-self: stretch; padding-right: 1rem; border-right: 1px solid var(--pencil); }
 .article-rail > .note { margin-left: 0.25rem; }
 .article-rail > p.hand { margin: 1rem 0 0.5rem; }
 .article-notes { margin-top: 2.5rem; display: grid; gap: 1.25rem; }
 .article-notes:empty { display: none; }
-.article h1 { font-size: clamp(1.5rem, 3.8vw, 2.8rem); line-height: 1.05; overflow-wrap: anywhere; min-width: 0; }
+.article h1 { font-size: clamp(1.5rem, 3.8vw, 2.8rem); margin-bottom: 0; overflow-wrap: anywhere; min-width: 0; }
 .article .prose { margin-left: 15rem; }
 .article .meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-items: baseline; color: var(--graphite); font-size: 0.9rem; margin-top: 0.6rem; }
 .article .links { display: flex; flex-wrap: wrap; gap: 1.2rem; margin-top: 1rem; font-size: 0.95rem; }

@@ -1,5 +1,5 @@
 ---
-title: MNIST-1D Decoder-Only Transformer classifier
+title: MNIST-1D decoder-only transformer classifier
 description: A decoder-only transformer built from scratch in PyTorch to classify MNIST-1D signals.
 date: 2026-07-11
 tags: [machine-learning]
