@@ -1,8 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
-import { byDate } from '../../utils';
+import { byDate, published } from '../../utils';
 import Base from '../../layouts/Base.astro';
-const posts = (await getCollection('blog')).sort(byDate);
+const posts = (await getCollection('blog', published)).sort(byDate);
 const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 ---
 <Base title="Blog · Antyabha Rahman" description="thoughts and ideas">

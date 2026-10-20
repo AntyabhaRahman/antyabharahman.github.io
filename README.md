@@ -20,7 +20,7 @@ Each section is one folder under `src/content/`. One Markdown file is one page, 
 
 | Folder | Required keys | Optional keys |
 | --- | --- | --- |
-| `blog/` | `title`, `description`, `date` | `tags`, `note` |
+| `blog/` | `title`, `description`, `date` | `tags`, `note`, `draft` |
 | `research/` | `title`, `authors`, `venue`, `date`, `description` | `openreview`, `pdf`, `arxiv`, `code` |
 | `projects/` | `title`, `description`, `date` | `tags`, `status` (`active` or `done`), `repo`, `url` |
 
@@ -52,7 +52,7 @@ Each section lists its entries by `date`, newest first.
 
 Put images in `public/blog/` and link them as `![Alt text](/blog/figure.png)`. The content security policy in `astro.config.mjs` allows images only from the site itself, so an image hotlinked from another domain does not load.
 
-Every file in `blog/` is published. There is no draft flag.
+To keep a post unpublished, add `draft: true` to its frontmatter. `npm run dev` still shows the post, and the built site leaves it out of the post pages, the blog list, and the home panel. If you add `draft` to an existing post while the dev server runs, restart the server. `src/content/blog/new-post.md` is a draft skeleton to copy.
 
 ### Write math
 

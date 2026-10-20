@@ -6,3 +6,6 @@ export const venueWithYear = (venue: string, date: Date) => {
 	const year = date.getFullYear();
 	return new RegExp(`\\b${year}\\b`).test(venue) ? venue : `${venue}, ${year}`;
 };
+
+// Drafts render under `npm run dev` and stay out of the built site.
+export const published = (e: { data: { draft?: boolean } }) => import.meta.env.DEV || !e.data.draft;

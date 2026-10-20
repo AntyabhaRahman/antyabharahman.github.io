@@ -4,10 +4,10 @@ import Base from '../layouts/Base.astro';
 import Deck from '../components/Deck.astro';
 import About from '../components/About.astro';
 import PixelCanvas from '../components/PixelCanvas.astro';
-import { byDate } from '../utils';
+import { byDate, published } from '../utils';
 
 const section = async (name: 'projects' | 'blog' | 'research') => {
-	const all = (await getCollection(name)).sort(byDate);
+	const all = (await getCollection(name, published)).sort(byDate);
 	return {
 		href: `/${name}/`,
 		count: all.length,

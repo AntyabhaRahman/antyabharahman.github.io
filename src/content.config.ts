@@ -13,6 +13,7 @@ export const collections = {
 			date: z.coerce.date(),
 			tags: z.array(z.string()).default([]),
 			note: z.string().optional(), // one margin note shown beside the post
+			draft: z.boolean().default(false), // hidden from the build, shown by the dev server
 		}),
 	}),
 	research: defineCollection({
