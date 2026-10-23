@@ -1,3 +1,4 @@
 User-agent: *
 Disallow: /cv.pdf
 Disallow: /resume.pdf
+Disallow: /mask-off-site/
