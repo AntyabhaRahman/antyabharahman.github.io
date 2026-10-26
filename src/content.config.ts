@@ -28,6 +28,7 @@ export const collections = {
 			openreview: z.string().url().optional(),
 			arxiv: z.string().url().optional(),
 			code: z.string().url().optional(),
+			site: z.string().url().optional(), // the title links here instead of the paper's page
 		}),
 	}),
 	projects: defineCollection({

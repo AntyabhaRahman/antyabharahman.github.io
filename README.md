@@ -21,7 +21,7 @@ Each section is one folder under `src/content/`. One Markdown file is one page, 
 | Folder | Required keys | Optional keys |
 | --- | --- | --- |
 | `blog/` | `title`, `description`, `date` | `tags`, `note`, `draft` |
-| `research/` | `title`, `authors`, `venue`, `date`, `description` | `openreview`, `pdf`, `arxiv`, `code` |
+| `research/` | `title`, `authors`, `venue`, `date`, `description` | `openreview`, `pdf`, `arxiv`, `code`, `site` |
 | `projects/` | `title`, `description`, `date` | `tags`, `status` (`active` or `done`), `repo`, `url` |
 
 The schema for each folder is in `src/content.config.ts`. If a file misses a required key, the build fails and names the file.
@@ -29,6 +29,8 @@ The schema for each folder is in `src/content.config.ts`. If a file misses a req
 Write titles in sentence case and capitalize the first word after a colon: "MASK-OFF: Evaluating LLMs for omission of material fact". The headline style does not change case, so the title shows as written.
 
 Each section lists its entries by `date`, newest first.
+
+If a research paper sets `site`, its title on the Research page and the home panel opens that URL instead of the paper's page. The paper's page still builds.
 
 ### Add a blog post
 

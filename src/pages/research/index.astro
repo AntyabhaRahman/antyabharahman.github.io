@@ -11,7 +11,7 @@ const papers = (await getCollection('research')).sort(byDate);
 		<ol class="list">
 			{papers.map((p) => (
 				<li class="card rough" data-px data-px-border>
-					<h2><a class="u" href={`/research/${p.id}/`}>{p.data.title}</a></h2>
+					<h2><a class="u" href={p.data.site ?? `/research/${p.id}/`}>{p.data.title}</a></h2>
 					<p class="muted" style="margin:0">{p.data.authors.join(', ')}</p>
 					<p style="margin:0">{p.data.description}</p>
 					<div class="meta">
